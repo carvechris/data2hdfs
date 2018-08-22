@@ -15,7 +15,7 @@ import java.util.Map;
 public class UBUserSMSLogDataProcessBolt extends BaseRichBolt {
 
     private OutputCollector collector;
-    private static final String FIELD_SEPARATOR = "\0001";
+    private static final String FIELD_SEPARATOR = "\001";
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
