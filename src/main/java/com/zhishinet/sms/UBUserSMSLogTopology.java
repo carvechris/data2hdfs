@@ -18,8 +18,6 @@ public class UBUserSMSLogTopology {
 
     public static StormTopology createTopology(){
 
-        // 输出字段分隔符
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\n");
         // 每1000个tuple同步到hdfs一次
         SyncPolicy syncPolicy = new CountSyncPolicy(1000);
         // 每个文件的大小为100M
@@ -28,7 +26,7 @@ public class UBUserSMSLogTopology {
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/apps/hive/warehouse/busdata.db/ubusersmslog").withPrefix("ubusersmslog_").withExtension(".txt");
         // 执行HDFS地址
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl("hdfs://localhost:8020")
-                .withFileNameFormat(fileNameFormat).withRecordFormat(format).withRotationPolicy(policy).withSyncPolicy(syncPolicy);
+                .withFileNameFormat(fileNameFormat).withRotationPolicy(policy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("ubusersmslogspout", UBUserSMSLogSpout.getSpout());

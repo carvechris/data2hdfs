@@ -9,7 +9,7 @@ import org.apache.storm.spout.SchemeAsMultiScheme;
 public class UBUserSMSLogSpout {
 
     public static KafkaSpout getSpout() {
-        BrokerHosts boBrokerHosts = new ZkHosts("127.0.0.1:2182");
+        BrokerHosts boBrokerHosts = new ZkHosts("127.0.0.1:2181");
         String topic = "UBUserSMSLog";
         String zkRoot = "/";
         String spoutId = "ubusersmslog_storm";
