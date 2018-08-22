@@ -30,7 +30,7 @@ public class UBUserSMSLogTopology {
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("ubusersmslogspout", UBUserSMSLogSpout.getSpout());
-        builder.setBolt("dataprocess",new UBUserSMSLogDataProcessBolt()).shuffleGrouping("ubusersmslog_storm");
+        builder.setBolt("dataprocess",new UBUserSMSLogDataProcessBolt()).shuffleGrouping("ubusersmslogspout");
         builder.setBolt("hdfsbolt", hdfsBolt).shuffleGrouping("dataprocess");
         return builder.createTopology();
     }
