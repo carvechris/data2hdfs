@@ -1,0 +1,8 @@
+**/rebel.xml
+.idea
+**/target/
+**/*.iml
+*.tar.gz
+**/.DS_Store
+.settings/*
+logs
