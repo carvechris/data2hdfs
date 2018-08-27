@@ -16,7 +16,7 @@ public class KakfaProceduer {
 
     public static void main(String[] args) throws InterruptedException, JsonProcessingException {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", "macos:9092");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         //生产者发送消息
@@ -42,6 +42,7 @@ public class KakfaProceduer {
             String value = objectMapper.writeValueAsString(ubUserSMSLogMap.get(i));
             ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic, value);
             procuder.send(msg);
+            if(i == 3) { i = 1;}
         }
 
     }
