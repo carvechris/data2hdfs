@@ -1,12 +1,9 @@
 package com.zhishinet.homeworkcenter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
-import com.zhishinet.homework.entity.launch.HomeworkAssignEntity;
 import com.zhishinet.mongo.MongoHelper;
-import com.zhishinet.sms.UBUserSMSLog;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
