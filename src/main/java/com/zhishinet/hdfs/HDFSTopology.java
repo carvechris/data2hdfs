@@ -12,7 +12,6 @@ import org.apache.storm.hdfs.bolt.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.bolt.rotation.FileSizeRotationPolicy;
 import org.apache.storm.hdfs.bolt.sync.CountSyncPolicy;
 import org.apache.storm.hdfs.bolt.sync.SyncPolicy;
-import org.apache.storm.kafka.KafkaSpout;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -42,7 +41,7 @@ public class HDFSTopology  {
         @Override
         public void nextTuple() {
             this.spoutOutputCollector.emit(new Values(++i,"name"+i));
-//            Utils.sleep(200);
+            Utils.sleep(200);
         }
 
         @Override
