@@ -61,12 +61,13 @@ public class SMSLogTopology {
 
     public static void main(String[] args) {
 
-        BrokerHosts boBrokerHosts = new ZkHosts("macos:2181");
+        BrokerHosts boBrokerHosts = new ZkHosts("localhost:2181");
         String topic = "UBUserSMSLog";
         String zkRoot = "";
         String spoutId = "ubusersmslog_storm";
         SpoutConfig spoutConfig = new SpoutConfig(boBrokerHosts, topic, zkRoot, spoutId);
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+
 
         // use "|" instead of "," for field delimiter
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
@@ -74,9 +75,13 @@ public class SMSLogTopology {
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 1MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/tomaer/");
-        HdfsBolt bolt = new HdfsBolt().withFsUrl("hdfs://macos:8020").withFileNameFormat(fileNameFormat)
-                .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/");
+        HdfsBolt bolt = new HdfsBolt()
+                .withFsUrl("hdfs://localhost:9000")
+                .withFileNameFormat(fileNameFormat)
+                .withRecordFormat(format)
+                .withRotationPolicy(rotationPolicy)
+                .withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("KafkaSpout",new KafkaSpout(spoutConfig));
