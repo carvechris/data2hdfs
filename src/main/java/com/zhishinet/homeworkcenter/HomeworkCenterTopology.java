@@ -1,7 +1,5 @@
 package com.zhishinet.homeworkcenter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.storm.hdfs.bolt.HdfsBolt;
 import org.apache.storm.hdfs.trident.HdfsState;
 import org.apache.storm.hdfs.trident.HdfsStateFactory;
 import org.apache.storm.hdfs.trident.HdfsUpdater;
@@ -11,30 +9,22 @@ import org.apache.storm.hdfs.trident.format.FileNameFormat;
 import org.apache.storm.hdfs.trident.format.RecordFormat;
 import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
-import org.apache.storm.hdfs.trident.sync.CountSyncPolicy;
-import org.apache.storm.hdfs.trident.sync.SyncPolicy;
 import org.apache.storm.kafka.*;
 import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.BaseAggregator;
+import org.apache.storm.trident.operation.BaseFunction;
 import org.apache.storm.trident.operation.TridentCollector;
-import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.state.StateFactory;
-import org.apache.storm.trident.testing.MemoryMapState;
-import org.apache.storm.trident.topology.TridentTopologyBuilder;
 import org.apache.storm.trident.tuple.TridentTuple;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.bson.Document;
-
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -46,38 +36,15 @@ import java.util.Map;
  * @Date 2018/8/29 13:10
  */
 public class HomeworkCenterTopology {
-    public static class HomeworkCenterBolt extends BaseRichBolt {
-
-        private OutputCollector collector;
-
-        @Override
-        public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-            this.collector = outputCollector;
-        }
-
-        @Override
-        public void execute(Tuple tuple) {
-            final String json = tuple.getString(0);
-            Document log = null;
-            log = Document.parse(json);
-            this.collector.emit(new Values(log.get("Score")));
-        }
-
-        @Override
-        public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(new Fields("id","key","mobilePhoneNo","code","state","returnMsg","postTime","createdOn"));
-        }
-    }
-
+    //用于算平均分的聚合类
     public static class AvgState{
-        long count = 0;
-        long total = 0;
+        float count = 0;
+        float total = 0;
 
         double getAverage(){
             return total/count;
         }
     }
-
     public static class AvgAgg extends BaseAggregator<AvgState>{
 
         @Override
@@ -87,13 +54,24 @@ public class HomeworkCenterTopology {
 
         @Override
         public void aggregate(AvgState state, TridentTuple tuple, TridentCollector collector) {
-            state.count++;
-            state.total++;
+            state.total += (float)tuple.get(3);
+            state.count += 1;
         }
 
         @Override
         public void complete(AvgState state, TridentCollector collector) {
             collector.emit(new Values(state.getAverage()));
+        }
+    }
+
+    //数据预处理
+    public static class PreProcessData extends BaseFunction {
+        @Override
+        public void execute(TridentTuple tuple, TridentCollector collector) {
+            String json = tuple.getString(0);
+            Document launch = Document.parse(json);
+            collector.emit(new Values(launch.get("AssessmentId"), launch.get("SessionId"), launch.get("UserId"), launch.get("Score")));
+
         }
     }
 
@@ -129,12 +107,9 @@ public class HomeworkCenterTopology {
         //构建TridentTopology, 流式API将数据处理为想要的形式
         TridentTopology topology = new TridentTopology();
         topology.newStream("KafkaSpout",new KafkaSpout(spoutConfig))
+                .each(new PreProcessData(), new Fields("AssessmentId", "SessionId", "UserId", "Score"))
                 .aggregate(new Fields("Score"), new AvgAgg(), new Fields("Avg"))
                 .partitionPersist(factory, hdfsFields, new HdfsUpdater(), new Fields());
-
-
-
-
 
     }
 }
