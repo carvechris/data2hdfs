@@ -37,8 +37,6 @@ public class KafkaProducerHW {
 
         while(mongoCursor.hasNext()){
             String value = mongoCursor.next().toJson();
-            System.out.println(value);
-            System.out.println(i++);
             ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic,value);
             procuder.send(msg);
         }

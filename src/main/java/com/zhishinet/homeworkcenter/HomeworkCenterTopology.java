@@ -1,5 +1,7 @@
 package com.zhishinet.homeworkcenter;
 
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
 import org.apache.storm.hdfs.trident.HdfsState;
 import org.apache.storm.hdfs.trident.HdfsStateFactory;
 import org.apache.storm.hdfs.trident.HdfsUpdater;
@@ -10,11 +12,17 @@ import org.apache.storm.hdfs.trident.format.RecordFormat;
 import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
 import org.apache.storm.kafka.*;
+import org.apache.storm.kafka.trident.TransactionalTridentKafkaSpout;
+import org.apache.storm.kafka.trident.TridentKafkaConfig;
 import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.BaseAggregator;
 import org.apache.storm.trident.operation.BaseFunction;
+import org.apache.storm.trident.operation.CombinerAggregator;
 import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.operation.builtin.Count;
+import org.apache.storm.trident.operation.builtin.Debug;
+import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.state.StateFactory;
 import org.apache.storm.trident.tuple.TridentTuple;
 import org.apache.storm.tuple.Fields;
@@ -39,24 +47,6 @@ public class HomeworkCenterTopology {
             return total/count;
         }
     }
-    public static class AvgAgg extends BaseAggregator<AvgState>{
-
-        @Override
-        public AvgState init(Object batchId, TridentCollector collector) {
-            return new AvgState();
-        }
-
-        @Override
-        public void aggregate(AvgState state, TridentTuple tuple, TridentCollector collector) {
-            state.total += (float)tuple.get(3);
-            state.count += 1;
-        }
-
-        @Override
-        public void complete(AvgState state, TridentCollector collector) {
-            collector.emit(new Values(state.getAverage()));
-        }
-    }
 
     //数据预处理
     public static class PreProcessData extends BaseFunction {
@@ -69,19 +59,54 @@ public class HomeworkCenterTopology {
         }
     }
 
+    public static class Average implements CombinerAggregator<Number> {
+
+        int count = 0;
+        double sum = 0;
+
+        @Override
+        public Double init(final TridentTuple tuple) {
+            this.count++;
+            if (!(tuple.getValue(0) instanceof Double)) {
+
+                double d = ((Number) tuple.getValue(0)).doubleValue();
+
+                this.sum += d;
+
+                return d;
+            }
+
+            this.sum += (Double) tuple.getValue(0);
+            return (Double) tuple.getValue(0);
+
+        }
+
+        @Override
+        public Double combine(final Number val1, final Number val2) {
+            return this.sum / this.count;
+
+        }
+
+        @Override
+        public Double zero() {
+            this.sum = 0;
+            this.count = 0;
+            return 0D;
+        }
+    }
+
 
     public static void main(String[] args) {
 
         BrokerHosts boBrokerHosts = new ZkHosts("localhost:2181");
         String topic = "HomewrokCenter";
-        String zkRoot = "";
         String spoutId = "HomewrokCenter_storm";
-        SpoutConfig spoutConfig = new SpoutConfig(boBrokerHosts, topic, zkRoot, spoutId);
-        spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+        TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, topic, spoutId);
+        kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
 
         //定义策略, Trident方式准备持久化到HDFS
-        Fields hdfsFields = new Fields("AssessmentId", "SessionId", "AverageScore");
+        Fields hdfsFields = new Fields("AssessmentId", "SessionId","Avg");
         FileNameFormat fileNameFormat = new DefaultFileNameFormat()
                 .withPrefix("trident")
                 .withExtension(".txt")
@@ -100,10 +125,15 @@ public class HomeworkCenterTopology {
 
         //构建TridentTopology, 流式API将数据处理为想要的形式
         TridentTopology topology = new TridentTopology();
-        topology.newStream("KafkaSpout",new KafkaSpout(spoutConfig))
-                .each(new PreProcessData(), new Fields("AssessmentId", "SessionId", "UserId", "Score"))
-                .aggregate(new Fields("Score"), new AvgAgg(), new Fields("Avg"))
+        topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig))
+                .each(new Fields("str"), new PreProcessData(), new Fields("AssessmentId", "SessionId", "UserId", "Score"))
+                .groupBy(new Fields("AssessmentId", "SessionId"))
+                .aggregate(new Fields("Score"), new Average(), new Fields("Avg"))
                 .partitionPersist(factory, hdfsFields, new HdfsUpdater(), new Fields());
+
+        //运行
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("TridentTopology",new Config(),topology.build());
 
     }
 }
