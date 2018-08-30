@@ -9,7 +9,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.Properties;
 
 /**
  * <p>Title:  data2hdfs <br/> </p>
@@ -22,22 +22,18 @@ import java.util.*;
 public class KafkaProducerHW {
     public static void main(String[] args) throws InterruptedException, JsonProcessingException {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", Conf.KAFKA_BOOTSTRAP_SERVERS);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        //生产者发送消息
-        String topic = "HomewrokCenter";
-        Producer<String, String> procuder = new KafkaProducer<String,String>(props);
+
+        Producer<String, String> procuder = new KafkaProducer<String, String>(props);
 
         //从collection中获取数据, 并发事件
         FindIterable<Document> findIterable = MongoHelper.MongoStart().getCollection("stormtest").find();
         MongoCursor<Document> mongoCursor = findIterable.iterator();
-
-        Integer i = 0;
-
-        while(mongoCursor.hasNext()){
+        while (mongoCursor.hasNext()) {
             String value = mongoCursor.next().toJson();
-            ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic,value);
+            ProducerRecord<String, String> msg = new ProducerRecord<String, String>(Conf.TOPIC_HOMEWROKCENTER, value);
             procuder.send(msg);
         }
     }

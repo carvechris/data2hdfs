@@ -4,6 +4,8 @@ import com.zhishinet.homeworkcenter.Field;
 import org.apache.storm.tuple.ITuple;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
 import org.apache.storm.redis.common.mapper.RedisStoreMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Title:  data2hdfs <br/> </p>
@@ -15,6 +17,7 @@ import org.apache.storm.redis.common.mapper.RedisStoreMapper;
  */
 public class AssessmentStoreMapper implements RedisStoreMapper {
     private static final String REDIS_PREFIX = "strom:trident:";
+    private static Logger logger = LoggerFactory.getLogger(AssessmentStoreMapper.class);
 
     @Override
     public RedisDataTypeDescription getDataTypeDescription() {
@@ -23,10 +26,9 @@ public class AssessmentStoreMapper implements RedisStoreMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        tuple.getValues().stream().forEach(o -> System.out.println(o.toString()));
         final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
         final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
-        System.out.println(String.format("getKeyFromTuple AssessmentId : %d, SessionId : %d", assessmentId, sessionId));
+        logger.info("PUT Data to Redis Key {}{}:{}", REDIS_PREFIX, assessmentId, sessionId);
         return REDIS_PREFIX + assessmentId+":"+sessionId;
     }
 
@@ -34,7 +36,7 @@ public class AssessmentStoreMapper implements RedisStoreMapper {
     public String getValueFromTuple(ITuple tuple) {
         final Double sum = tuple.getDoubleByField(Field.FIELD_SUM);
         final Integer count = tuple.getIntegerByField(Field.FIELD_COUNT);
-        System.out.println(String.format("getValueFromTuple Sum : %f, Count : %d", sum, count));
+        logger.info("PUT Data to Redis Vaule {}:{}", sum, count);
         return ""+sum +":"+ count;
     }
 }
