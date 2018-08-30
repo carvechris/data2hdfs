@@ -1,5 +1,6 @@
 package com.zhishinet.homeworkcenter.redis;
 
+import com.zhishinet.homeworkcenter.Field;
 import org.apache.storm.tuple.ITuple;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
 import org.apache.storm.redis.common.mapper.RedisStoreMapper;
@@ -22,11 +23,18 @@ public class AssessmentStoreMapper implements RedisStoreMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        return REDIS_PREFIX + tuple.getInteger(0)+":"+tuple.getInteger(1);
+        tuple.getValues().stream().forEach(o -> System.out.println(o.toString()));
+        final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
+        final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
+        System.out.println(String.format("getKeyFromTuple AssessmentId : %d, SessionId : %d", assessmentId, sessionId));
+        return REDIS_PREFIX + assessmentId+":"+sessionId;
     }
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
-        return tuple.getString(2) +":"+ tuple.getString(3);
+        final Double sum = tuple.getDoubleByField(Field.FIELD_SUM);
+        final Integer count = tuple.getIntegerByField(Field.FIELD_COUNT);
+        System.out.println(String.format("getValueFromTuple Sum : %f, Count : %d", sum, count));
+        return ""+sum +":"+ count;
     }
 }

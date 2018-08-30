@@ -1,5 +1,6 @@
 package com.zhishinet.homeworkcenter;
 
+import com.zhishinet.Conf;
 import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper;
 import javafx.collections.transformation.FilteredList;
 import org.apache.storm.Config;
@@ -59,8 +60,14 @@ public class HomeworkCenterTopology {
         public void execute(TridentTuple tuple, TridentCollector collector) {
             String json = tuple.getString(0);
             Document launch = Document.parse(json);
+            final Integer assessmentId = launch.getInteger(Field.FIELD_ASSESSMENTID);
+            final Integer sessionId = launch.getInteger(Field.FIELD_SESSIONID);
+            final Double score = launch.getDouble(Field.FIELD_SCORE);
+            System.out.println("======预处理数据==========");
+            System.out.println("AssessmentId : " + assessmentId + " , SessionId : "+ sessionId + " ,Score : " + score);
+            System.out.println("======预处理数据==========");
             //从HBase取 sum  count
-            collector.emit(new Values(launch.get("AssessmentId"), launch.get("SessionId")));
+            collector.emit(new Values(assessmentId, sessionId, score));
 
         }
     }
@@ -72,20 +79,26 @@ public class HomeworkCenterTopology {
         @Override
         public List<String> batchRetrieve(RedisState redisState, List<TridentTuple> list) {
             List<String> ret = new ArrayList();
+            System.out.println("----------Redis查询-----------------");
+            list.stream().forEach(t -> System.out.println("AsessmentId : " + t.getInteger(0) +" ,SessionId : "+ t.getInteger(1) +" ,Score : "+ t.getDoubleByField("Score")));
             for(TridentTuple input: list) {
-                ret.add(redisState.getJedis().get(REDIS_PREFIX + input.getInteger(0)+":"+input.getInteger(1)));
+                ret.add(redisState.getJedis().get(REDIS_PREFIX + input.getIntegerByField(Field.FIELD_ASSESSMENTID) + ":" +input.getIntegerByField(Field.FIELD_SESSIONID)));
             }
+            System.out.println("++++++++查询到的结果++++++++++++");
+            ret.stream().forEach(s -> System.out.println(s));
             return ret;
         }
 
         @Override
         public void execute(TridentTuple tridentTuple, String s, TridentCollector tridentCollector) {
             if(s == null || "".equals(s)){
-               return;
+                System.out.println("数据缓存没有查询到");
+                System.out.println("想外发射数据 AssessmentId : " + tridentTuple.getIntegerByField("AssessmentId") + " ,SessionId : " + tridentTuple.getIntegerByField("SessionId") + ",Score : " + tridentTuple.getDoubleByField("Score"));
+                tridentCollector.emit(new Values(tridentTuple.getDoubleByField(Field.FIELD_SCORE), 1));
             } else{
-                System.out.println("================== "+ s);
+                System.out.println("S 的值是 : "+ s);
                 String[] result = s.split(":");
-                tridentCollector.emit(new Values(tridentTuple.getInteger(0),tridentTuple.getInteger(1), result[0], result[1]));
+                tridentCollector.emit(new Values( tridentTuple.getDoubleByField(Field.FIELD_SCORE) + Double.valueOf(result[0]), Integer.valueOf(result[1]) + 1));
             }
         }
     }
@@ -93,7 +106,7 @@ public class HomeworkCenterTopology {
 
     public static void main(String[] args) {
 
-        BrokerHosts boBrokerHosts = new ZkHosts("localhost:2181");
+        BrokerHosts boBrokerHosts = new ZkHosts("macos:2181");
         String topic = "HomewrokCenter";
         String spoutId = "HomewrokCenter_storm";
         TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, topic, spoutId);
@@ -101,11 +114,11 @@ public class HomeworkCenterTopology {
 
 
         //HDFS 落盘方式
-        Fields persistFields = new Fields("AssessmentId", "SessionId","Sum","Count");
+        Fields persistFields = new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID,Field.FIELD_SUM,Field.FIELD_COUNT);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat()
                 .withPrefix("trident")
                 .withExtension(".txt")
-                .withPath("/trident");
+                .withPath("/user/tomaer/trident");
         RecordFormat recordFormat = new DelimitedRecordFormat()
                 .withFields(persistFields).withFieldDelimiter("\001");
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
@@ -113,14 +126,12 @@ public class HomeworkCenterTopology {
                 .withFileNameFormat(fileNameFormat)
                 .withRecordFormat(recordFormat)
                 .withRotationPolicy(rotationPolicy)
-                .withFsUrl("hdfs://localhost:9000");
+                .withFsUrl(Conf.HDFS_URI);
         StateFactory hdfsFactory = new HdfsStateFactory().withOptions(options);
 
         // redis落盘方式
-        String redisHost ="10.213.0.42";
-        Integer redisPort = 6379;
         JedisPoolConfig poolConfig = new JedisPoolConfig.Builder()
-                .setHost(redisHost).setPort(redisPort)
+                .setHost(Conf.REDIS_HOST).setPort(Conf.REDIS_PORT)
                 .build();
         RedisState.Factory redisFactory = new RedisState.Factory(poolConfig);
         //redis读写和实体映射
@@ -136,8 +147,8 @@ public class HomeworkCenterTopology {
         TridentTopology topology = new TridentTopology();
         TridentState redisState = topology.newStaticState(redisFactory);
         topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig))
-                .each(new Fields("str"), new PreProcessLaunchData(), new Fields("AssessmentId", "SessionId"))
-                .stateQuery(redisState, new Fields("AssessmentId","SessionId"), new FetchSumAndCountFromReids(), new Fields("Sum", "Count"))
+                .each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE))
+                .stateQuery(redisState, new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE), new FetchSumAndCountFromReids(), new Fields(Field.FIELD_SUM, Field.FIELD_COUNT))
                 //HDFS落盘
 //                .partitionPersist(hdfsFactory, persistFields, new HdfsUpdater(), new Fields());
                 //Redis落盘
