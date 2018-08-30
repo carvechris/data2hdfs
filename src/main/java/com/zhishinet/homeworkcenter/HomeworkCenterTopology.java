@@ -28,9 +28,7 @@ import org.apache.storm.redis.trident.state.RedisStateUpdater;
 import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
-import org.apache.storm.trident.operation.BaseFunction;
-import org.apache.storm.trident.operation.CombinerAggregator;
-import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.operation.*;
 import org.apache.storm.trident.state.BaseQueryFunction;
 import org.apache.storm.trident.state.StateFactory;
 import org.apache.storm.trident.tuple.TridentTuple;
@@ -38,11 +36,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.bson.Document;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>Title:  data2hdfs <br/> </p>
@@ -63,19 +57,15 @@ public class HomeworkCenterTopology {
             final Integer assessmentId = launch.getInteger(Field.FIELD_ASSESSMENTID);
             final Integer sessionId = launch.getInteger(Field.FIELD_SESSIONID);
             final Double score = launch.getDouble(Field.FIELD_SCORE);
-            System.out.println("======预处理数据==========");
-            System.out.println("AssessmentId : " + assessmentId + " , SessionId : "+ sessionId + " ,Score : " + score);
-            System.out.println("======预处理数据==========");
-            //从HBase取 sum  count
-            collector.emit(new Values(assessmentId, sessionId, score));
-
+            final Integer userId = launch.getInteger(Field.FIELD_USERID);
+            System.out.println(String.format("Rece Kafka Message AssessmentId : %d ,SessionId : %d ,UserId : %d ,Score : %f", assessmentId,sessionId,userId,score));
+            collector.emit(new Values(assessmentId, sessionId, score,userId));
         }
     }
 
     //从redis查询数据
     public static class FetchSumAndCountFromReids extends BaseQueryFunction<RedisState,String> {
         private static final String REDIS_PREFIX = "strom:trident:";
-
         @Override
         public List<String> batchRetrieve(RedisState redisState, List<TridentTuple> list) {
             List<String> ret = new ArrayList();
@@ -147,12 +137,32 @@ public class HomeworkCenterTopology {
         TridentTopology topology = new TridentTopology();
         TridentState redisState = topology.newStaticState(redisFactory);
         topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig))
-                .each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE))
+                .each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE, Field.FIELD_USERID))
+                .filter(new Filter() {
+                    @Override
+                    public boolean isKeep(TridentTuple tuple) {
+                        final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
+                        final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
+                        final Integer userId = tuple.getIntegerByField(Field.FIELD_USERID);
+                        //查询Redis, 有就返回 false。没有返回 true
+                        return true;
+                    }
+
+                    @Override
+                    public void prepare(Map conf, TridentOperationContext context) {
+
+                    }
+
+                    @Override
+                    public void cleanup() {
+
+                    }
+                })
                 .stateQuery(redisState, new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE), new FetchSumAndCountFromReids(), new Fields(Field.FIELD_SUM, Field.FIELD_COUNT))
                 //HDFS落盘
 //                .partitionPersist(hdfsFactory, persistFields, new HdfsUpdater(), new Fields());
                 //Redis落盘
-                .partitionPersist(redisFactory, persistFields, new RedisStateUpdater(storeMapper), new Fields());
+                .partitionPersist(redisFactory, persistFields, new RedisStateUpdater(storeMapper), new Fields()).parallelismHint(1);
 
         //运行
         LocalCluster cluster = new LocalCluster();
