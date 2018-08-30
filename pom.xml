@@ -115,6 +115,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- storm-redis -->
+        <dependency>
+            <groupId>org.apache.storm</groupId>
+            <artifactId>storm-redis</artifactId>
+            <version>${storm.version}</version>
+        </dependency>
+
         <!-- kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
