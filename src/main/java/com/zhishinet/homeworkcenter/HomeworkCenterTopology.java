@@ -69,13 +69,16 @@ public class HomeworkCenterTopology {
         @Override
         public List<String> batchRetrieve(RedisState redisState, List<TridentTuple> list) {
             List<String> ret = new ArrayList();
-            System.out.println("----------Redis查询-----------------");
             list.stream().forEach(t -> System.out.println("AsessmentId : " + t.getInteger(0) +" ,SessionId : "+ t.getInteger(1) +" ,Score : "+ t.getDoubleByField("Score")));
             for(TridentTuple input: list) {
-                ret.add(redisState.getJedis().get(REDIS_PREFIX + input.getIntegerByField(Field.FIELD_ASSESSMENTID) + ":" +input.getIntegerByField(Field.FIELD_SESSIONID)));
+                final Integer assessmentId = input.getIntegerByField(Field.FIELD_ASSESSMENTID);
+                final Integer sessionId = input.getIntegerByField(Field.FIELD_SESSIONID);
+                String valueOfRedis = redisState.getJedis().get(REDIS_PREFIX + assessmentId + ":" + sessionId);
+                System.out.println(String.format("Get value of redis %s_%d:%d ,Result : %s", REDIS_PREFIX,assessmentId,sessionId,valueOfRedis));
+                ret.add(valueOfRedis);
             }
             System.out.println("++++++++查询到的结果++++++++++++");
-            ret.stream().forEach(s -> System.out.println(s));
+            ret.stream().forEach(System.out::println);
             return ret;
         }
 
