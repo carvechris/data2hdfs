@@ -71,17 +71,39 @@ public class HomeworkCenterTopology {
         private static final String REDIS_PREFIX = "strom:trident:";
         @Override
         public List<String> batchRetrieve(RedisState redisState, List<TridentTuple> tridentTuples) {
+            //批量将相同assessmentId 和 sessionId 的聚合成一套记录传递到到res中, 然后传递到下一步 execute
+            //返回结果, 每个assessmentId + sessionid只会对应一条记录
             List<String> ret = new ArrayList();
+            //用来标记本次batch迭代中 , 是否已经从redis中获取过值了
+            Map<String,String> existMap = new HashMap<>();
             for(int i = 0 ;i <tridentTuples.size(); i++) {
                 TridentTuple tuple = tridentTuples.get(i);
                 final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
                 final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
                 final Double score = tuple.getDoubleByField(Field.FIELD_SCORE);
-                logger.info("Redis Query Method tridentTuples[{}] Paramter AsessmentId : {} ,SessionId: {} ,Score : {}", i, assessmentId, sessionId, score);
-                String valueOfRedis = redisState.getJedis().get(REDIS_PREFIX + assessmentId + ":" + sessionId);
-                logger.info("Get value of redis {}{}:{} ,Result : {}",REDIS_PREFIX,assessmentId,sessionId,valueOfRedis);
-                ret.add(valueOfRedis);
+
+                if(existMap.containsKey(assessmentId+":"+sessionId)){
+                    //如果map里面已经有值了, 需要对相同assessmentId 和 sessionId的数据做累加, 更新到existMap中
+                    String[] currentValue = existMap.get(assessmentId+":"+sessionId).split(":");
+                    existMap.put(assessmentId+":"+sessionId, String.valueOf(score + Double.valueOf(currentValue[0]))+ ":"+ (Integer.valueOf(currentValue[1])+1));
+                }else{
+                    //如果existMap里面没有, 则将查询到的redis数据放到existMap中
+                    logger.info("Redis Query Method tridentTuples[{}] Paramter AsessmentId : {} ,SessionId: {} ,Score : {}", i, assessmentId, sessionId, score);
+                    String valueOfRedis = redisState.getJedis().get(REDIS_PREFIX + assessmentId + ":" + sessionId);
+                    if(valueOfRedis == null || valueOfRedis.equals("")){
+                        //redis里面没有数据, 证明这是第一次统计该assessmentId + sessionId的数据
+                        existMap.put(assessmentId+":"+sessionId, score+":"+ 1);
+                    }else{
+                        //redis里面有数据, 这个时候需要将数据做累加, 在放到existMap中
+                        String[] currentValue = valueOfRedis.split(":");
+                        existMap.put(assessmentId+":"+sessionId, String.valueOf(score + Double.valueOf(currentValue[0]))+ ":"+ (Integer.valueOf(currentValue[1])+1));
+                    }
+                    logger.info("Get value of redis {}{}:{} ,Result : {}",REDIS_PREFIX,assessmentId,sessionId,valueOfRedis);
+                }
             }
+
+            //existMap的values就是要返回的值
+            ret.addAll(existMap.values());
             return ret;
         }
 
