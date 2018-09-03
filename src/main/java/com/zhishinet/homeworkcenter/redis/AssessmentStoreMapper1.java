@@ -18,11 +18,11 @@ public class AssessmentStoreMapper1 implements RedisStoreMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        return Field.FIELD_ASSESSMENTID + "_" + tuple.getIntegerByField(Field.FIELD_ASSESSMENTID) + "_" + Field.FIELD_SESSIONID + "_" + tuple.getIntegerByField(Field.FIELD_SESSIONID) + "_" + Field.FIELD_USERID + "_" + tuple.getIntegerByField(Field.FIELD_USERID);
+        return Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + "_" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + "_" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID);
     }
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
-        return tuple.getDoubleByField(Field.FIELD_SCORE) + "";
+        return tuple.getDoubleByField(Field.SCORE) + "";
     }
 }

@@ -64,10 +64,10 @@ public class HomeworkCenterTopology {
             }catch (Exception ex) {
                 logger.error("Parse Document exception", ex);
             }
-            final Integer assessmentId = launch.getInteger(Field.FIELD_ASSESSMENTID);
-            final Integer sessionId = launch.getInteger(Field.FIELD_SESSIONID);
-            final Double score = launch.getDouble(Field.FIELD_SCORE);
-            final Integer userId = launch.getInteger(Field.FIELD_USERID);
+            final Integer assessmentId = launch.getInteger(Field.ASSESSMENTID);
+            final Integer sessionId = launch.getInteger(Field.SESSIONID);
+            final Double score = launch.getDouble(Field.SCORE);
+            final Integer userId = launch.getInteger(Field.USERID);
             logger.info("Rece Kafka Message AssessmentId : {} ,SessionId : {} ,UserId : {} ,Score : {}",assessmentId,sessionId,userId,score);
             collector.emit(new Values(assessmentId, sessionId, score,userId));
         }
@@ -86,9 +86,9 @@ public class HomeworkCenterTopology {
             Map<String,String> existMap = new HashMap<>();
             for(int i = 0 ;i <tridentTuples.size(); i++) {
                 TridentTuple tuple = tridentTuples.get(i);
-                final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
-                final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
-                final Double score = tuple.getDoubleByField(Field.FIELD_SCORE);
+                final Integer assessmentId = tuple.getIntegerByField(Field.ASSESSMENTID);
+                final Integer sessionId = tuple.getIntegerByField(Field.SESSIONID);
+                final Double score = tuple.getDoubleByField(Field.SCORE);
 
                 if(existMap.containsKey(assessmentId+":"+sessionId)){
                     //如果map里面已经有值了, 需要对相同assessmentId 和 sessionId的数据做累加, 更新到existMap中
@@ -121,10 +121,10 @@ public class HomeworkCenterTopology {
             if(s == null || "".equals(s)){
                 System.out.println("数据缓存没有查询到");
                 System.out.println("想外发射数据 AssessmentId : " + tridentTuple.getIntegerByField("AssessmentId") + " ,SessionId : " + tridentTuple.getIntegerByField("SessionId") + ",Score : " + tridentTuple.getDoubleByField("Score"));
-                tridentCollector.emit(new Values(tridentTuple.getDoubleByField(Field.FIELD_SCORE), 1));
+                tridentCollector.emit(new Values(tridentTuple.getDoubleByField(Field.SCORE), 1));
             } else {
                 String[] result = s.split(":");
-                tridentCollector.emit(new Values( tridentTuple.getDoubleByField(Field.FIELD_SCORE) + Double.valueOf(result[0]), Integer.valueOf(result[1]) + 1));
+                tridentCollector.emit(new Values( tridentTuple.getDoubleByField(Field.SCORE) + Double.valueOf(result[0]), Integer.valueOf(result[1]) + 1));
             }
         }
     }
@@ -149,7 +149,7 @@ public class HomeworkCenterTopology {
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
         //HDFS 落盘方式
-        Fields persistFields = new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID,Field.FIELD_SUM,Field.FIELD_COUNT);
+        Fields persistFields = new Fields(Field.ASSESSMENTID, Field.SESSIONID,Field.SUM,Field.COUNT);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat()
                 .withPrefix("trident")
                 .withExtension(".txt")
@@ -182,14 +182,14 @@ public class HomeworkCenterTopology {
         TridentTopology topology = new TridentTopology();
         TridentState redisState = topology.newStaticState(redisFactory);
         Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig));
-        stream.each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE, Field.FIELD_USERID))
-                //.partitionBy(new Fields(Field.FIELD_ASSESSMENTID,Field.FIELD_SESSIONID,Field.FIELD_USERID))
+        stream.each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID))
+                //.partitionBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.USERID))
                 .filter(new Filter() {
                     @Override
                     public boolean isKeep(TridentTuple tuple) {
-                        final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
-                        final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
-                        final Integer userId = tuple.getIntegerByField(Field.FIELD_USERID);
+                        final Integer assessmentId = tuple.getIntegerByField(Field.ASSESSMENTID);
+                        final Integer sessionId = tuple.getIntegerByField(Field.SESSIONID);
+                        final Integer userId = tuple.getIntegerByField(Field.USERID);
                         //查询Redis, 有就返回 false。没有返回 true
                         return true;
                     }
@@ -204,7 +204,7 @@ public class HomeworkCenterTopology {
 
                     }
                 })
-                .stateQuery(redisState, new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE), new FetchSumAndCountFromReids(), new Fields(Field.FIELD_SUM, Field.FIELD_COUNT)).parallelismHint(1)
+                .stateQuery(redisState, new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE), new FetchSumAndCountFromReids(), new Fields(Field.SUM, Field.COUNT)).parallelismHint(1)
                 //HDFS落盘
 //                .partitionPersist(hdfsFactory, persistFields, new HdfsUpdater(), new Fields());
                 //Redis落盘

@@ -54,8 +54,8 @@ public class AssessmentLookupMapper implements RedisLookupMapper {
     @Override
     public List<Values> toTuple(ITuple tuple, Object value) {
         List<Values> values = new ArrayList<Values>();
-        final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
-        final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
+        final Integer assessmentId = tuple.getIntegerByField(Field.ASSESSMENTID);
+        final Integer sessionId = tuple.getIntegerByField(Field.SESSIONID);
         SumAndCount sumAndCount = maps.get(assessmentId + sessionId + "");
         if (sumAndCount != null) {
             sumAndCount.setSum(sumAndCount.getSum() + Double.parseDouble(value.toString()));
@@ -78,12 +78,12 @@ public class AssessmentLookupMapper implements RedisLookupMapper {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(Field.FIELD_SUM, Field.FIELD_COUNT));
+        declarer.declare(new Fields(Field.SUM, Field.COUNT));
     }
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        return Field.FIELD_ASSESSMENTID + "_" + tuple.getIntegerByField(Field.FIELD_ASSESSMENTID) + "_" + Field.FIELD_SESSIONID + "_" + tuple.getIntegerByField(Field.FIELD_SESSIONID) + "_" + Field.FIELD_USERID + "_" + tuple.getIntegerByField(Field.FIELD_USERID);
+        return Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + "_" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + "_" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID);
     }
 
     @Override

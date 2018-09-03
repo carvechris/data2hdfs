@@ -1,10 +1,20 @@
 package com.zhishinet.homeworkcenter;
 
+import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import com.zhishinet.homeworkcenter.redis.AssessmentLookupMapper;
 import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper1;
 import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper2;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.hdfs.trident.HdfsState;
+import org.apache.storm.hdfs.trident.HdfsStateFactory;
+import org.apache.storm.hdfs.trident.HdfsUpdater;
+import org.apache.storm.hdfs.trident.format.DefaultFileNameFormat;
+import org.apache.storm.hdfs.trident.format.DelimitedRecordFormat;
+import org.apache.storm.hdfs.trident.format.FileNameFormat;
+import org.apache.storm.hdfs.trident.format.RecordFormat;
+import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
+import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
 import org.apache.storm.kafka.BrokerHosts;
 import org.apache.storm.kafka.StringScheme;
 import org.apache.storm.kafka.ZkHosts;
@@ -20,12 +30,8 @@ import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
-import org.apache.storm.trident.operation.BaseFunction;
-import org.apache.storm.trident.operation.TridentCollector;
-import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.state.StateFactory;
 import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Values;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,27 +46,6 @@ import org.slf4j.LoggerFactory;
 public class HomeworkCenterTopology1 {
 
     private static Logger logger = LoggerFactory.getLogger(HomeworkCenterTopology1.class);
-
-    public static class PreProcessLaunchData extends BaseFunction {
-        private static Logger logger = LoggerFactory.getLogger(PreProcessLaunchData.class);
-        @Override
-        public void execute(TridentTuple tuple, TridentCollector collector) {
-            String json = tuple.getString(0);
-            Document launch = null;
-            try {
-             launch = Document.parse(json);
-            }catch (Exception ex) {
-                logger.error("Parse Document exception", ex);
-            }
-            final Integer assessmentId = launch.getInteger(Field.FIELD_ASSESSMENTID);
-            final Integer sessionId = launch.getInteger(Field.FIELD_SESSIONID);
-            final Double score = launch.getDouble(Field.FIELD_SCORE);
-            final Integer userId = launch.getInteger(Field.FIELD_USERID);
-            collector.emit(new Values(assessmentId, sessionId, score,userId));
-        }
-    }
-
-
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -80,29 +65,24 @@ public class HomeworkCenterTopology1 {
 
         TridentTopology topology = new TridentTopology();
         TridentState state = topology.newStaticState(redisFactory);
-        Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig))
-                .each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE, Field.FIELD_USERID));
+        Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream1 = stream
+                .each(new Fields("str"), new PreProcessLauch2Tracking(), new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID));
 
-        stream
-                .partitionPersist(
-                    redisFactory,
-                    new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SCORE, Field.FIELD_USERID),
-                    new RedisStateUpdater(storeMapper1),
-                    new Fields()
-                );
+        stream1.partitionPersist(redisFactory,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),new RedisStateUpdater(storeMapper1),new Fields());
 
-        stream
-                .stateQuery(
-                        state,
-                        new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_USERID),
-                        new RedisStateQuerier(lookupMapper),
-                        new Fields(Field.FIELD_SUM, Field.FIELD_COUNT))
-                .partitionPersist(
-                        redisFactory,
-                        new Fields(Field.FIELD_ASSESSMENTID, Field.FIELD_SESSIONID, Field.FIELD_SUM, Field.FIELD_COUNT),
-                        new RedisStateUpdater(storeMapper2),
-                        new Fields()
-                );
+        stream1.stateQuery(state,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID),new RedisStateQuerier(lookupMapper),new Fields(Field.SUM, Field.COUNT))
+                .partitionPersist(redisFactory,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT),new RedisStateUpdater(storeMapper2), new Fields());
+
+        Fields hdfsFields = new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID);
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/tomaer").withPrefix("trident").withExtension(".txt");
+        RecordFormat recordFormat = new DelimitedRecordFormat().withFields(hdfsFields).withFieldDelimiter("\u0001");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(5.0f, FileSizeRotationPolicy.Units.MB);
+        HdfsState.Options options = new HdfsState.HdfsFileOptions().withFileNameFormat(fileNameFormat).withRecordFormat(recordFormat).withRotationPolicy(rotationPolicy).withFsUrl(Conf.HDFS_URL).withConfigKey("hdfs.config");
+        StateFactory factory = new HdfsStateFactory().withOptions(options);
+        stream1.partitionPersist(factory, hdfsFields, new HdfsUpdater(), new Fields());
+
+
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("TridentTopology",new Config(),topology.build());
     }
