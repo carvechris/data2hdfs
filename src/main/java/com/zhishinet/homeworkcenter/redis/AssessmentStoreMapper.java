@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @Date 2018/8/30 1:32
  */
 public class AssessmentStoreMapper implements RedisStoreMapper {
-    private static final String REDIS_PREFIX = "strom:trident:";
+
     private static Logger logger = LoggerFactory.getLogger(AssessmentStoreMapper.class);
 
     @Override
@@ -26,17 +26,11 @@ public class AssessmentStoreMapper implements RedisStoreMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        final Integer assessmentId = tuple.getIntegerByField(Field.FIELD_ASSESSMENTID);
-        final Integer sessionId = tuple.getIntegerByField(Field.FIELD_SESSIONID);
-        logger.info("PUT Data to Redis Key {}{}:{}", REDIS_PREFIX, assessmentId, sessionId);
-        return REDIS_PREFIX + assessmentId+":"+sessionId;
+        return tuple.getStringByField("key");
     }
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
-        final Double sum = tuple.getDoubleByField(Field.FIELD_SUM);
-        final Integer count = tuple.getIntegerByField(Field.FIELD_COUNT);
-        logger.info("PUT Data to Redis Vaule {}:{}", sum, count);
-        return ""+sum +":"+ count;
+        return tuple.getStringByField("value");
     }
 }
