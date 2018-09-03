@@ -1,7 +1,6 @@
 package com.zhishinet.sms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zhishinet.hdfs.HDFSTopology;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.StormTopology;

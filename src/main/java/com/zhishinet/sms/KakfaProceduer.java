@@ -1,15 +1,14 @@
 package com.zhishinet.sms;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zhishinet.sms.UBUserSMSLog;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 
 public class KakfaProceduer {

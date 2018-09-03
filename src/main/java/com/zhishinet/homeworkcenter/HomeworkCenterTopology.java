@@ -1,6 +1,6 @@
 package com.zhishinet.homeworkcenter;
 
-import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper;
+import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper1;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.hdfs.trident.HdfsState;
@@ -11,7 +11,9 @@ import org.apache.storm.hdfs.trident.format.FileNameFormat;
 import org.apache.storm.hdfs.trident.format.RecordFormat;
 import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
-import org.apache.storm.kafka.*;
+import org.apache.storm.kafka.BrokerHosts;
+import org.apache.storm.kafka.StringScheme;
+import org.apache.storm.kafka.ZkHosts;
 import org.apache.storm.kafka.trident.TransactionalTridentKafkaSpout;
 import org.apache.storm.kafka.trident.TridentKafkaConfig;
 import org.apache.storm.redis.common.config.JedisPoolConfig;
@@ -22,7 +24,10 @@ import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
-import org.apache.storm.trident.operation.*;
+import org.apache.storm.trident.operation.BaseFunction;
+import org.apache.storm.trident.operation.Filter;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.operation.TridentOperationContext;
 import org.apache.storm.trident.state.BaseQueryFunction;
 import org.apache.storm.trident.state.StateFactory;
 import org.apache.storm.trident.tuple.TridentTuple;
@@ -32,7 +37,10 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Title:  data2hdfs <br/> </p>
@@ -162,7 +170,7 @@ public class HomeworkCenterTopology {
                 .build();
         RedisState.Factory redisFactory = new RedisState.Factory(poolConfig);
         //redis读写和实体映射
-        RedisStoreMapper storeMapper = new AssessmentStoreMapper();
+        RedisStoreMapper storeMapper = new AssessmentStoreMapper1();
 
         //TODO: HBASE落盘方式
 
