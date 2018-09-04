@@ -5,6 +5,7 @@ public class Field {
     public static final String ASSESSMENTID = "AssessmentId";
     public static final String SESSIONID = "SessionId";
     public static final String SCORE = "Score";
+    public static final String TOTAL_SCORE = "TotalScore";
     public static final String USERID = "UserId";
     public static final String SUM = "Sum";
     public static final String COUNT = "Count";

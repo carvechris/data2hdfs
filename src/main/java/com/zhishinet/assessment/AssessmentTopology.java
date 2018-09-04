@@ -1,20 +1,14 @@
-package com.zhishinet.homeworkcenter;
+package com.zhishinet.assessment;
 
+import com.zhishinet.assessment.redis.AssessmentLookupMapper;
+import com.zhishinet.assessment.redis.AssessmentStoreMapper1;
+import com.zhishinet.assessment.redis.AssessmentStoreMapper2;
+import com.zhishinet.example.PrintFunction;
+import com.zhishinet.homeworkcenter.Conf;
+import com.zhishinet.homeworkcenter.Field;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
-import com.zhishinet.homeworkcenter.redis.AssessmentLookupMapper;
-import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper1;
-import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper2;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
-import org.apache.storm.hdfs.trident.HdfsState;
-import org.apache.storm.hdfs.trident.HdfsStateFactory;
-import org.apache.storm.hdfs.trident.HdfsUpdater;
-import org.apache.storm.hdfs.trident.format.DefaultFileNameFormat;
-import org.apache.storm.hdfs.trident.format.DelimitedRecordFormat;
-import org.apache.storm.hdfs.trident.format.FileNameFormat;
-import org.apache.storm.hdfs.trident.format.RecordFormat;
-import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
-import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
 import org.apache.storm.kafka.BrokerHosts;
 import org.apache.storm.kafka.StringScheme;
 import org.apache.storm.kafka.ZkHosts;
@@ -30,7 +24,8 @@ import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
-import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.trident.operation.builtin.Count;
+import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,15 +38,15 @@ import org.slf4j.LoggerFactory;
  * @Author <a herf="q315744068@gmail.com"/>Vincent Li<a/> <br/></p>
  * @Date 2018/8/29 13:10
  */
-public class HomeworkCenterTopology1 {
+public class AssessmentTopology {
 
-    private static Logger logger = LoggerFactory.getLogger(HomeworkCenterTopology1.class);
+    private static Logger logger = LoggerFactory.getLogger(AssessmentTopology.class);
 
 
     public static void main(String[] args) throws InterruptedException {
 
         BrokerHosts boBrokerHosts = new ZkHosts(Conf.ZOOKEEPER_LIST);
-        final String spoutId = "HomewrokCenter_storm";
+        final String spoutId = "HomeworkCenter_storm";
         TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, Conf.TOPIC_HOMEWORKCENTER, spoutId);
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
@@ -71,18 +66,26 @@ public class HomeworkCenterTopology1 {
 
         stream1.partitionPersist(redisFactory,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),new RedisStateUpdater(storeMapper1),new Fields());
 
-        stream1.stateQuery(state,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID),new RedisStateQuerier(lookupMapper),new Fields(Field.SUM, Field.COUNT))
-                .partitionPersist(redisFactory,new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT),new RedisStateUpdater(storeMapper2), new Fields());
-
-        Fields hdfsFields = new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/tomaer").withPrefix("trident").withExtension(".txt");
-        RecordFormat recordFormat = new DelimitedRecordFormat().withFields(hdfsFields).withFieldDelimiter("\u0001");
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(5.0f, FileSizeRotationPolicy.Units.MB);
-        HdfsState.Options options = new HdfsState.HdfsFileOptions().withFileNameFormat(fileNameFormat).withRecordFormat(recordFormat).withRotationPolicy(rotationPolicy).withFsUrl(Conf.HDFS_URL).withConfigKey("hdfs.config");
-        StateFactory factory = new HdfsStateFactory().withOptions(options);
-        stream1.partitionPersist(factory, hdfsFields, new HdfsUpdater(), new Fields());
-
-
+        stream1
+                .stateQuery(
+                    state,
+                    new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID),
+                    new RedisStateQuerier(lookupMapper),new Fields(Field.TOTAL_SCORE)
+                ).groupBy(
+                    new Fields(Field.ASSESSMENTID, Field.SESSIONID)
+//                ).aggregate(
+//                    new Fields(Field.ASSESSMENTID, Field.SESSIONID),
+//                    new Count(),
+//                    new Fields(Field.COUNT)
+                ).aggregate(
+                    new Fields(Field.TOTAL_SCORE),
+                    new Sum(),
+                    new Fields(Field.SUM)
+                ).each(
+                    new Fields(Field.ASSESSMENTID, Field.SESSIONID,Field.SUM),
+                    new PrintFunction(),
+                    new Fields()
+                );
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("TridentTopology",new Config(),topology.build());
     }

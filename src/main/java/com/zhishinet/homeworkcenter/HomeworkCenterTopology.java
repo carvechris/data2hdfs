@@ -145,7 +145,7 @@ public class HomeworkCenterTopology {
         BrokerHosts boBrokerHosts = new ZkHosts(Conf.ZOOKEEPER_LIST);
         final String spoutId = "HomewrokCenter_storm";
 
-        TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, Conf.TOPIC_HOMEWROKCENTER, spoutId);
+        TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, Conf.TOPIC_HOMEWORKCENTER, spoutId);
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
         //HDFS 落盘方式

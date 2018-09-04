@@ -16,5 +16,5 @@ public class Conf {
 
     public final static String REDIS_HOST = HOST;
     public final static int REDIS_PORT = 6379;
-    public final static String TOPIC_HOMEWROKCENTER = "HomewrokCenter";
+    public final static String TOPIC_HOMEWORKCENTER = "HomeworkCenter";
 }

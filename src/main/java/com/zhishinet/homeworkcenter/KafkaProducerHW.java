@@ -7,7 +7,6 @@ import com.zhishinet.mongo.MongoHelper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.storm.utils.Utils;
 import org.bson.Document;
 
 import java.util.Properties;
@@ -34,10 +33,9 @@ public class KafkaProducerHW {
         MongoCursor<Document> mongoCursor = findIterable.iterator();
         while (mongoCursor.hasNext()) {
             String value = mongoCursor.next().toJson();
-            ProducerRecord<String, String> msg = new ProducerRecord<String, String>(Conf.TOPIC_HOMEWROKCENTER, value);
+            ProducerRecord<String, String> msg = new ProducerRecord<String, String>(Conf.TOPIC_HOMEWORKCENTER, value);
             procuder.send(msg);
         }
-        Utils.sleep(1000);
         procuder.close();
     }
 }
