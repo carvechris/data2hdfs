@@ -13,6 +13,7 @@ import org.apache.storm.redis.trident.state.RedisStateUpdater;
 import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
+import org.apache.storm.trident.operation.builtin.Count;
 import org.apache.storm.trident.testing.FixedBatchSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
@@ -20,14 +21,14 @@ import org.apache.storm.tuple.Values;
 public class Test {
 
     public static StormTopology buildTopology(){
-        Fields fields = new Fields("word", "count");
+        Fields fields = new Fields("word");
         FixedBatchSpout spout = new FixedBatchSpout(fields, 4,
-                new Values("storm", 1),
-                new Values("trident", 1),
-                new Values("needs", 1),
-                new Values("javadoc", 1)
+                new Values("storm"),
+                new Values("trident"),
+                new Values("needs"),
+                new Values("storm")
         );
-        spout.setCycle(true);
+        spout.setCycle(false);
 
         JedisPoolConfig poolConfig = new JedisPoolConfig.Builder().setHost(Conf.REDIS_HOST).setPort(Conf.REDIS_PORT).build();
         RedisState.Factory redisFactory = new RedisState.Factory(poolConfig);
@@ -37,18 +38,8 @@ public class Test {
 
 
         TridentTopology topology = new TridentTopology();
-        Stream stream = topology.newStream("spout1", spout);
-
-        stream.partitionPersist(redisFactory,
-                fields,
-                new RedisStateUpdater(storeMapper).withExpire(86400000),
-                new Fields());
-
-        TridentState state = topology.newStaticState(redisFactory);
-        stream = stream.stateQuery(state, new Fields("word"),
-                new RedisStateQuerier(lookupMapper),
-                new Fields("columnName","columnValue")).each(new Fields("word","columnValue"), new PrintFunction(), new Fields());
-
+        Stream stream = topology.newStream("spout1", spout).groupBy(new Fields("word"))
+            .aggregate(new Fields("word"),new Count(),new Fields("count")).each(new Fields("word","count"),new PrintFunction(),new Fields());
 
         return topology.build();
     }
