@@ -1,13 +1,17 @@
 package com.zhishinet.example;
 
+import org.apache.derby.impl.io.VFMemoryStorageFactory;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.StormTopology;
+import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.BaseFunction;
 import org.apache.storm.trident.operation.TridentCollector;
 import org.apache.storm.trident.operation.builtin.Count;
+import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.testing.FixedBatchSpout;
+import org.apache.storm.trident.testing.MemoryMapState;
 import org.apache.storm.trident.tuple.TridentTuple;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
@@ -36,7 +40,7 @@ public class Test {
 
     public static StormTopology buildTopology(){
         Fields fields = new Fields(Field.ASSESSMENTID,Field.SESSIONID, Field.USERID, Field.SCORE);
-        FixedBatchSpout spout = new FixedBatchSpout(fields, 4,
+        FixedBatchSpout spout = new FixedBatchSpout(fields, 200,
                 new Values(389259, 129678, 347113, 85.63636016845703d),
                 new Values(389259, 129678, 347110, 91.84091186523438d),
                 new Values(389259, 129678, 347107, 92.5d),
@@ -179,10 +183,17 @@ public class Test {
         );
         spout.setCycle(false);
         TridentTopology topology = new TridentTopology();
-        topology.newStream("spout1", spout)
+        Stream stream = topology.newStream("spout1", spout);
+        stream
                 .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
-                .aggregate(new Fields(Field.ASSESSMENTID,Field.SESSIONID),new Count(),new Fields(Field.COUNT))
+                .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.ASSESSMENTID,Field.SESSIONID),new Count(), new Fields(Field.COUNT))
+                .newValuesStream()
                 .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.COUNT),new PrintFunction(),new Fields());
+        stream
+                .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
+                .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.SCORE),new Sum(), new Fields(Field.SUM))
+                .newValuesStream()
+                .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM),new PrintFunction(),new Fields());
         return topology.build();
     }
 
