@@ -71,14 +71,20 @@ public class AssessmentTopology {
                     state,
                     new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID),
                     new RedisStateQuerier(lookupMapper),new Fields(Field.TOTAL_SCORE)
-                ).groupBy(
+                )
+//                .each(
+//                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID,Field.TOTAL_SCORE),
+//                        new PrintFunction(),
+//                        new Fields()
+//                )
+                .groupBy(
                     new Fields(Field.ASSESSMENTID, Field.SESSIONID)
 //                ).aggregate(
 //                    new Fields(Field.ASSESSMENTID, Field.SESSIONID),
 //                    new Count(),
 //                    new Fields(Field.COUNT)
                 ).aggregate(
-                    new Fields(Field.TOTAL_SCORE),
+                    new Fields(Field.ASSESSMENTID, Field.SESSIONID),
                     new Sum(),
                     new Fields(Field.SUM)
                 ).each(

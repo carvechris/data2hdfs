@@ -29,7 +29,6 @@ public class PrintFunction extends BaseFunction {
 
     @Override
     public void execute(TridentTuple tuple, TridentCollector tridentCollector) {
-//        tuple.getFields().forEach(f -> LOG.info("Field : {} ", f.toString()));
-        LOG.info(tuple.toString());
+        LOG.info("{} : {}", tuple.getFields().toString(),tuple.toString());
     }
 }
