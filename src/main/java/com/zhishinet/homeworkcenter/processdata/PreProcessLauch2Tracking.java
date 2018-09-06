@@ -1,7 +1,6 @@
 package com.zhishinet.homeworkcenter.processdata;
 
 import com.zhishinet.homeworkcenter.Field;
-import com.zhishinet.homeworkcenter.HomeworkCenterTopology1;
 import org.apache.storm.trident.operation.BaseFunction;
 import org.apache.storm.trident.operation.TridentCollector;
 import org.apache.storm.trident.tuple.TridentTuple;
@@ -9,6 +8,8 @@ import org.apache.storm.tuple.Values;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class PreProcessLauch2Tracking extends BaseFunction {
 
@@ -28,6 +29,15 @@ public class PreProcessLauch2Tracking extends BaseFunction {
         final Integer sessionId = launch.getInteger(Field.SESSIONID);
         final Double score = launch.getDouble(Field.SCORE);
         final Integer userId = launch.getInteger(Field.USERID);
-        collector.emit(new Values(sessionUserTrackingId,subjectId,assessmentId, sessionId, score,userId));
+
+        if(Objects.isNull(sessionUserTrackingId)) { logger.error("DataSource From Spout sessionUserTrackingId is null or empty"); return; }
+        if(Objects.isNull(subjectId)){ logger.error("DataSource From Spout sessionUserTrackingId is null or empty"); return; }
+        if(Objects.isNull(assessmentId)) { logger.error("DataSource From Spout assessmentId is null or empty"); return; }
+        if(Objects.isNull(sessionId)) { logger.error("DataSource From Spout sessionId is null or empty"); return; }
+        if(Objects.isNull(score)) { logger.error("DataSource From Spout score is null or empty"); return; }
+        if(Objects.isNull(userId)) { logger.error("DataSource From Spout userId is null or empty"); return; }
+
+        collector.emit(new Values(sessionUserTrackingId, subjectId, assessmentId, sessionId, score, userId));
+
     }
 }

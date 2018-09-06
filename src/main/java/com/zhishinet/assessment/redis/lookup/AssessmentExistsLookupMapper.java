@@ -19,6 +19,7 @@ import java.util.Objects;
  */
 public class AssessmentExistsLookupMapper implements RedisLookupMapper {
 
+    public static final String REDIS_KEY_PREFIX = "com:zhishinet:assessment:";
     private static Logger logger = LoggerFactory.getLogger(AssessmentExistsLookupMapper.class);
 
     @Override
@@ -41,7 +42,7 @@ public class AssessmentExistsLookupMapper implements RedisLookupMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        return Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + "_" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + "_" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID);
+        return REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + ":" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID);
     }
 
     @Override
