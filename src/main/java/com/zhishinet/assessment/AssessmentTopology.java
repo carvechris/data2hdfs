@@ -37,7 +37,7 @@ public class AssessmentTopology {
     private static Logger logger = LoggerFactory.getLogger(AssessmentTopology.class);
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         BrokerHosts boBrokerHosts = new ZkHosts(Conf.ZOOKEEPER_LIST);
         final String spoutId = "HomeworkCenter_storm";
@@ -70,18 +70,17 @@ public class AssessmentTopology {
                 .filter(
                         new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID, Field.SCORE, Field.ASSESSMENT_EXISTS),
                         new AssessmentFilter()
-                );
-        /**
-         * stream1都是没有被处理过的数据
-         * 将没被处理过的数据 写入redis key :
-         * REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + ":" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID)
-         */
-        stream1
+                )
+                /**
+                 * stream1都是没有被处理过的数据
+                 * 将没被处理过的数据 写入redis key :
+                 * REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + ":" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID)
+                 */
                 .partitionPersist(
                         redisFactory,
                         new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),
                         new RedisStateUpdater(assessmentSessionUserStoreMapper),
-                        new Fields()
+                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID)
                 )
                 .newValuesStream();
 
@@ -110,7 +109,6 @@ public class AssessmentTopology {
                 .project(
                         new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
                 );
-
         // 消息中的 作业班级总分，总提交人数
         Stream stream3 = topology.join(
                 stream1
