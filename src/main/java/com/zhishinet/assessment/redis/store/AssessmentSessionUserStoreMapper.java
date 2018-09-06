@@ -1,4 +1,4 @@
-package com.zhishinet.assessment.redis;
+package com.zhishinet.assessment.redis.store;
 
 import com.zhishinet.homeworkcenter.Field;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
@@ -7,9 +7,9 @@ import org.apache.storm.tuple.ITuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AssessmentStoreMapper1 implements RedisStoreMapper {
+public class AssessmentSessionUserStoreMapper implements RedisStoreMapper {
 
-    private static Logger logger = LoggerFactory.getLogger(AssessmentStoreMapper1.class);
+    private static Logger logger = LoggerFactory.getLogger(AssessmentSessionUserStoreMapper.class);
 
     @Override
     public RedisDataTypeDescription getDataTypeDescription() {

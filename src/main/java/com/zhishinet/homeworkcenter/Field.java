@@ -16,4 +16,7 @@ public class Field {
     public static final String SUBJECT_ID = "SubjectId";
 
 
+    public static final String ASSESSMENT_EXISTS = "AssessmentExists";
+
+
 }
