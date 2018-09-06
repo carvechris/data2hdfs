@@ -1,7 +1,7 @@
-package com.zhishinet.assessment.redis;
+package com.zhishinet.assessment.redis.lookup;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.sun.tools.corba.se.idl.InterfaceGen;
 import com.zhishinet.homeworkcenter.Field;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
 import org.apache.storm.redis.common.mapper.RedisLookupMapper;
@@ -12,34 +12,34 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class AssessmentLookupMapper implements RedisLookupMapper {
+public class AssessmentSessionTotalScoreTotalCountLookupMapper implements RedisLookupMapper {
 
-    private static Logger logger = LoggerFactory.getLogger(AssessmentLookupMapper.class);
+    private static Logger logger = LoggerFactory.getLogger(AssessmentSessionTotalScoreTotalCountLookupMapper.class);
+    public static final String REDIS_KEY_PREFIX = "com:zhishinet:assessment:";
 
     @Override
     public RedisDataTypeDescription getDataTypeDescription() {
-        return new RedisDataTypeDescription(RedisDataTypeDescription.RedisDataType.HASH, "Assessment");
+        return new RedisDataTypeDescription(RedisDataTypeDescription.RedisDataType.STRING, "Assessment");
     }
 
     @Override
     public List<Values> toTuple(ITuple iTuple, Object o) {
+        String [] objects = o.toString().split("_");
         List<Values> values = Lists.newArrayList();
-        values.add(new Values(Double.valueOf(o.toString())));
+        values.add(new Values(Double.valueOf(objects[0]),Integer.valueOf(objects[1])));
         return values;
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(Field.TOTAL_SCORE));
+        declarer.declare(new Fields(Field.SUM, Field.COUNT));
     }
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
-        return Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + "_" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + "_" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID);
+        return REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID);
     }
 
     @Override

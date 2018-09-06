@@ -1,12 +1,9 @@
 package com.zhishinet.assessment;
 
-import com.zhishinet.assessment.redis.AssessmentLookupMapper;
 import com.zhishinet.assessment.redis.store.AssessmentSessionTotalScoreTotalCountStoreMapper;
 import com.zhishinet.assessment.redis.store.AssessmentSessionUserStoreMapper;
 import com.zhishinet.assessment.redis.filter.AssessmentFilter;
 import com.zhishinet.assessment.redis.lookup.AssessmentExistsLookupMapper;
-import com.zhishinet.homeworkcenter.Conf;
-import com.zhishinet.homeworkcenter.Field;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -69,11 +66,16 @@ public class AssessmentTopology {
                         new RedisStateQuerier(assessmentExistsLookupMapper),
                         new Fields(Field.ASSESSMENT_EXISTS)
                 )
+                //处理过的数据直接忽略掉
                 .filter(
                         new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID, Field.SCORE, Field.ASSESSMENT_EXISTS),
                         new AssessmentFilter()
                 );
-
+        /**
+         * stream1都是没有被处理过的数据
+         * 将没被处理过的数据 写入redis key :
+         * REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + ":" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID)
+         */
         stream1
                 .partitionPersist(
                         redisFactory,
@@ -84,19 +86,33 @@ public class AssessmentTopology {
                 .newValuesStream();
 
         // 查询已经有的作业班级总分 总提交人数
-//        Stream stream2 = stream1
-//                .stateQuery(
-//                        state,
-//                        new Fields(Field.ASSESSMENTID, Field.SESSIONID),
-//                        new RedisStateQuerier(assessmentExistsLookupMapper),
-//                        new Fields(Field.SUM,Field.COUNT)
-//                )
-//                .groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-//                .toStream()
-//                .each(new Fields(Field.ASSESSMENTID, Field.SESSIONID,Field.SUM,Field.COUNT),new PrintFunction(), new Fields());
+        Stream stream2 = stream1
+                .stateQuery(
+                        state,
+                        new Fields(Field.ASSESSMENTID, Field.SESSIONID),
+                        new RedisStateQuerier(assessmentExistsLookupMapper),
+                        new Fields(Field.SUM,Field.COUNT)
+                )
+                .groupBy(
+                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
+                )
+                /**
+                 * 因为根据 Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Test.Field.COUNT 可能会查询出来多条值
+                 * 对这些值进行计数操作之后就只有有一条值，进行镜像操作，去除最后的count
+                 */
+                .persistentAggregate(
+                        new MemoryMapState.Factory(),
+                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT),
+                        new Count(),
+                        new Fields(Field.DISTINCT_RECORDS_FIELD)
+                )
+                .newValuesStream()
+                .project(
+                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
+                );
 
         // 消息中的 作业班级总分，总提交人数
-        topology.join(
+        Stream stream3 = topology.join(
                 stream1
                     .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
                     .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.SCORE),new Sum(), new Fields(Field.SUM))
@@ -108,27 +124,32 @@ public class AssessmentTopology {
                     .newValuesStream(),
                     new Fields(Field.ASSESSMENTID,Field.SESSIONID),
                 new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
-        ).partitionPersist(
-                redisFactory,
-                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT),
-                new RedisStateUpdater(assessmentSessionTotalScoreTotalCountStoreMapper),
-                new Fields()
         );
-//
-//        topology.join(
-//                stream2,
-//                new Fields(Field.ASSESSMENTID,Field.SESSIONID),
-//                stream3,
-//                new Fields(Field.ASSESSMENTID,Field.SESSIONID),
-//                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
-//        )
-//        .partitionPersist(
-//                redisFactory,
-//                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT),
-//                new RedisStateUpdater(assessmentSessionTotalScoreTotalCountStoreMapper),
-//                new Fields()
-//        );
+
+        Stream stream4 = topology.merge(stream2,stream3);
+
+        topology.join(
+                stream4
+                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
+                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.SUM),new Sum(), new Fields(Field.TOTAL_SUM))
+                        .newValuesStream(),
+                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
+                stream4
+                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
+                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.COUNT),new Sum(), new Fields(Field.TOTAL_COUNT))
+                        .newValuesStream(),
+                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
+                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT)
+        )
+        .partitionPersist(
+            redisFactory,
+            new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT),
+            new RedisStateUpdater(assessmentSessionTotalScoreTotalCountStoreMapper),
+            new Fields()
+        );
         LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("TridentTopology",new Config(),topology.build());
+        Config config = new Config();
+//        config.setNumWorkers(2);
+        cluster.submitTopology("TridentTopology",config,topology.build());
     }
 }

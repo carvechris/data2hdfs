@@ -1,6 +1,6 @@
 package com.zhishinet.assessment.redis.store;
 
-import com.zhishinet.homeworkcenter.Field;
+import com.zhishinet.assessment.Field;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
 import org.apache.storm.redis.common.mapper.RedisStoreMapper;
 import org.apache.storm.tuple.ITuple;
@@ -24,6 +24,6 @@ public class AssessmentSessionTotalScoreTotalCountStoreMapper implements RedisSt
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
-        return tuple.getDoubleByField(Field.SUM) +"_"+ tuple.getLongByField(Field.COUNT);
+        return tuple.getDoubleByField(Field.TOTAL_SUM) +"_"+ tuple.getLongByField(Field.TOTAL_SUM);
     }
 }

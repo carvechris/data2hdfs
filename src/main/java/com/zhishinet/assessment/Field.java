@@ -8,7 +8,11 @@ public class Field {
     public static final String TOTAL_SCORE = "TotalScore";
     public static final String USERID = "UserId";
     public static final String SUM = "Sum";
+    public static final String TOTAL_SUM = "TotalSum";
     public static final String COUNT = "Count";
+    public static final String TOTAL_COUNT = "TotalCount";
+    public static final String DISTINCT_RECORDS_FIELD = "DistinctRecordsField";
+
 
 
     public static final String SESSIONUSERTRACKINGID = "SessionUserTrackingId";
