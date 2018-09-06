@@ -3,7 +3,6 @@ package com.zhishinet.assessment;
 import com.zhishinet.assessment.redis.AssessmentLookupMapper;
 import com.zhishinet.assessment.redis.store.AssessmentSessionTotalScoreTotalCountStoreMapper;
 import com.zhishinet.assessment.redis.store.AssessmentSessionUserStoreMapper;
-import com.zhishinet.assessment.redis.AssessmentStoreMapper2;
 import com.zhishinet.assessment.redis.filter.AssessmentFilter;
 import com.zhishinet.assessment.redis.lookup.AssessmentExistsLookupMapper;
 import com.zhishinet.homeworkcenter.Conf;
@@ -55,7 +54,6 @@ public class AssessmentTopology {
         RedisStoreMapper assessmentSessionUserStoreMapper = new AssessmentSessionUserStoreMapper();
         RedisStoreMapper assessmentSessionTotalScoreTotalCountStoreMapper = new AssessmentSessionTotalScoreTotalCountStoreMapper();
 
-        RedisLookupMapper lookupMapper = new AssessmentLookupMapper();
         RedisLookupMapper assessmentExistsLookupMapper = new AssessmentExistsLookupMapper();
 
         TridentTopology topology = new TridentTopology();
