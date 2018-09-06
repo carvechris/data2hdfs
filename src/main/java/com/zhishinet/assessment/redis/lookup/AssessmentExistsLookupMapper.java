@@ -36,7 +36,7 @@ public class AssessmentExistsLookupMapper implements RedisLookupMapper {
 
     @Override
     public RedisDataTypeDescription getDataTypeDescription() {
-        return new RedisDataTypeDescription(RedisDataTypeDescription.RedisDataType.HASH, "Assessment");
+        return new RedisDataTypeDescription(RedisDataTypeDescription.RedisDataType.STRING, "Assessment");
     }
 
 
