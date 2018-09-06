@@ -12,7 +12,6 @@ public class AssessmentFilter extends BaseFilter {
     @Override
     public boolean isKeep(TridentTuple tuple) {
         boolean isKeep = !tuple.getBooleanByField(Field.ASSESSMENT_EXISTS);
-        logger.debug("tuple : {}, isKeep {}", tuple.toString(), isKeep);
         return isKeep;
     }
 }
