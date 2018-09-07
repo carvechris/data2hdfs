@@ -70,19 +70,20 @@ public class AssessmentTopology {
                 .filter(
                         new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.USERID, Field.SCORE, Field.ASSESSMENT_EXISTS),
                         new AssessmentFilter()
-                )
+                );
                 /**
                  * stream1都是没有被处理过的数据
                  * 将没被处理过的数据 写入redis key :
                  * REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID) + ":" + Field.USERID + "_" + tuple.getIntegerByField(Field.USERID)
                  */
-                .partitionPersist(
-                        redisFactory,
-                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),
-                        new RedisStateUpdater(assessmentSessionUserStoreMapper),
-                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID)
-                )
-                .newValuesStream();
+                stream1
+                    .partitionPersist(
+                            redisFactory,
+                            new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),
+                            new RedisStateUpdater(assessmentSessionUserStoreMapper),
+                            new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID)
+                    )
+                    .newValuesStream();
 
         // 查询已经有的作业班级总分 总提交人数
         Stream stream2 = stream1

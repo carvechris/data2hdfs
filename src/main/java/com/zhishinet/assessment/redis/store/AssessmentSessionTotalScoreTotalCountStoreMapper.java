@@ -24,6 +24,6 @@ public class AssessmentSessionTotalScoreTotalCountStoreMapper implements RedisSt
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
-        return tuple.getDoubleByField(Field.TOTAL_SUM) +"_"+ tuple.getLongByField(Field.TOTAL_SUM);
+        return tuple.getDoubleByField(Field.TOTAL_SUM) +"_"+ tuple.getLongByField(Field.TOTAL_COUNT);
     }
 }
