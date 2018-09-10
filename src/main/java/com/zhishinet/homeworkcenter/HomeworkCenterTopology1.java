@@ -65,7 +65,7 @@ public class HomeworkCenterTopology1 {
 
         TridentTopology topology = new TridentTopology();
         TridentState state = topology.newStaticState(redisFactory);
-        Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(kafkaConfig));
         Stream stream1 = stream
                 .each(new Fields("str"), new PreProcessLauch2Tracking(), new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID));
 

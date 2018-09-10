@@ -2,9 +2,11 @@ package com.zhishinet.sms;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhishinet.MyConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.storm.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ public class KakfaProceduer {
 
     public static void main(String[] args) throws InterruptedException, JsonProcessingException {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", MyConfig.KAFKA_BROKERS);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         //生产者发送消息
@@ -36,15 +38,13 @@ public class KakfaProceduer {
         ubUserSMSLogMap.put(2, ubUserSMSLog2);
         ubUserSMSLogMap.put(3, ubUserSMSLog3);
 
-        Integer j = 0;
         for (int i = 1; i <= 3; i++) {
             ObjectMapper objectMapper = new ObjectMapper();
             String value = objectMapper.writeValueAsString(ubUserSMSLogMap.get(i));
             ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic, value);
             procuder.send(msg);
-            System.out.println(j++);
-            if(i == 3) { i = 1;}
         }
-
+        Utils.sleep(1000);
+        procuder.close();
     }
 }

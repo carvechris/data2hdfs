@@ -129,8 +129,8 @@ public class HomeworkCenterTopology {
         }
     }
 
-//    protected static KafkaSpoutConfig<String, String> newKafkaSpoutConfig(String bootstrapServers) {
-//        return KafkaSpoutConfig.builder(bootstrapServers, TOPIC_1, TOPIC_2)
+//    protected static MyConfig<String, String> newKafkaSpoutConfig(String bootstrapServers) {
+//        return MyConfig.builder(bootstrapServers, TOPIC_1, TOPIC_2)
 //                .setProp(ConsumerConfig.GROUP_ID_CONFIG, "kafkaSpoutTestGroup_" + System.nanoTime())
 //                .setProp(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 200)
 //                .setRecordTranslator(JUST_VALUE_FUNC, new Fields("str"))
@@ -181,7 +181,7 @@ public class HomeworkCenterTopology {
         //构建TridentTopology, 流式API将数据处理为想要的形式
         TridentTopology topology = new TridentTopology();
         TridentState redisState = topology.newStaticState(redisFactory);
-        Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(kafkaConfig));
         stream.each(new Fields("str"), new PreProcessLaunchData(), new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID))
                 //.partitionBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.USERID))
                 .filter(new Filter() {

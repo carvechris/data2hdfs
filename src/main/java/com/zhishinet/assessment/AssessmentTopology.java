@@ -55,7 +55,7 @@ public class AssessmentTopology {
 
         TridentTopology topology = new TridentTopology();
         TridentState state = topology.newStaticState(redisFactory);
-        Stream stream = topology.newStream("KafkaSpout",new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(kafkaConfig));
         Stream stream1 = stream
                 // 先把Kafka中的数据解析成对象,包括 Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID 字段
                 .each(new Fields("str"), new PreProcessLauch2Tracking(), new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID))
