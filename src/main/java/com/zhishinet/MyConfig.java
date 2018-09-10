@@ -14,11 +14,11 @@ import java.util.Properties;
 
 public class MyConfig {
 
-    public static final String ZK_HOSTS = "172.30.74.239:2181";
+    public static final String ZK_HOSTS = "bigdata-ambari-agent-1:2181,bigdata-ambari-agent-2:2181,bigdata-ambari-agent-3:2181";
+    public static final int ZK_PORT = 2181;
     public static final String ZK_ROOT = StringUtils.EMPTY;
-    public static final String KAFKA_BROKERS = "172.30.74.239:9092";
-    public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
-
+    public static final String KAFKA_BROKERS = "bigdata-ambari-agent-1:9092,bigdata-ambari-agent-2:9092,bigdata-ambari-agent-3:9092";
+    public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);
@@ -26,7 +26,7 @@ public class MyConfig {
         List<String> zkServers = new ArrayList<>() ;
         Arrays.stream(zkHosts.brokerZkStr.split(",")).forEach(host-> zkServers.add(host.split(":")[0]));
         spoutConfig.zkServers = zkServers;
-        spoutConfig.zkPort = 2181;
+        spoutConfig.zkPort = ZK_PORT;
         spoutConfig.socketTimeoutMs = 60 * 1000 ;
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme()) ;
         spoutConfig.useStartOffsetTimeIfOffsetOutOfRange=true;
