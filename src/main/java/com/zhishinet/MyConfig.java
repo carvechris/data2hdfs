@@ -22,7 +22,7 @@ public class MyConfig {
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);
-        SpoutConfig spoutConfig = new SpoutConfig(zkHosts, topic,zkRoot,spoutId);
+        SpoutConfig spoutConfig = new SpoutConfig(zkHosts, topic, zkRoot, spoutId);
         List<String> zkServers = new ArrayList<>() ;
         Arrays.stream(zkHosts.brokerZkStr.split(",")).forEach(host-> zkServers.add(host.split(":")[0]));
         spoutConfig.zkServers = zkServers;
