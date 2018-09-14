@@ -1,7 +1,6 @@
 package com.zhishinet.assessment.redis.lookup;
 
 import com.google.common.collect.Lists;
-import com.sun.tools.corba.se.idl.InterfaceGen;
 import com.zhishinet.homeworkcenter.Field;
 import org.apache.storm.redis.common.mapper.RedisDataTypeDescription;
 import org.apache.storm.redis.common.mapper.RedisLookupMapper;

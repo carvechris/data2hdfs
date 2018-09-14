@@ -8,6 +8,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -20,6 +22,9 @@ import java.util.Properties;
  * @Date 2018/8/29 12:09
  */
 public class KafkaProducerHW {
+
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerHW.class);
+
     public static void main(String[] args) throws InterruptedException, JsonProcessingException {
         Properties props = new Properties();
         props.put("bootstrap.servers", Conf.KAFKA_BOOTSTRAP_SERVERS);
@@ -32,6 +37,7 @@ public class KafkaProducerHW {
         FindIterable<Document> findIterable = MongoHelper.MongoStart().getCollection("stormtest").find();
         MongoCursor<Document> mongoCursor = findIterable.iterator();
         while (mongoCursor.hasNext()) {
+            logger.info("===================== jsondatasent");
             String value = mongoCursor.next().toJson();
             ProducerRecord<String, String> msg = new ProducerRecord<String, String>(Conf.TOPIC_HOMEWORKCENTER, value);
             procuder.send(msg);
