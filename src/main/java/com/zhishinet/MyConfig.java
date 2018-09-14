@@ -15,10 +15,16 @@ import java.util.Properties;
 public class MyConfig {
 
     public static final String ZK_HOSTS = "bigdata-ambari-agent-1:2181,bigdata-ambari-agent-2:2181,bigdata-ambari-agent-3:2181";
+//    public static final String ZK_HOSTS = "172.30.74.239:2181,172.30.74.240:2181,172.30.74.241:2181";
+//    public static final String ZK_HOSTS = "127.0.0.1:2181";
     public static final int ZK_PORT = 2181;
+
     public static final String ZK_ROOT = StringUtils.EMPTY;
-    public static final String KAFKA_BROKERS = "bigdata-ambari-agent-1:9092,bigdata-ambari-agent-2:9092,bigdata-ambari-agent-3:9092";
+    public static final String KAFKA_BROKERS = "bigdata-ambari-agent-1:6667,bigdata-ambari-agent-2:6667,bigdata-ambari-agent-3:6667";
+//    public static final String KAFKA_BROKERS = "172.30.74.239:6667,172.30.74.240:6667,172.30.74.241:6667";
+//    public static final String KAFKA_BROKERS = "127.0.0.1:9092";
     public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
+//    public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);
@@ -42,7 +48,9 @@ public class MyConfig {
         props.put("linger.ms","1500");
         props.put("batch.size","16384");
         props.put("request.required.acks", "1");
-        props.put("serializer.class", "kafka.serializer.StringEnscoder");
+//        props.put("serializer.class", "kafka.serializer.JsonEnscoder");
+        props.put("key.deserializer",   "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE,            32);
         conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
         conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE,    16384);

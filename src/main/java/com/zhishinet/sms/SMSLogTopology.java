@@ -1,6 +1,8 @@
 package com.zhishinet.sms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.zhishinet.MyConfig;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -26,6 +28,8 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -36,7 +40,8 @@ public class SMSLogTopology {
     public static class SMSLogBolt extends BaseRichBolt {
 
         private OutputCollector collector;
-
+        private final static Logger logger = LoggerFactory.getLogger(SMSLogBolt.class);
+        private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         @Override
         public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
             this.collector = outputCollector;
@@ -45,13 +50,8 @@ public class SMSLogTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            ObjectMapper objectMapper = new ObjectMapper();
-            UBUserSMSLog log = null;
-            try {
-                log = objectMapper.readValue(json,UBUserSMSLog.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            logger.info("message: {}",json);
+            UBUserSMSLog log = gson.fromJson(json, UBUserSMSLog.class);
             this.collector.ack(tuple);
             this.collector.emit(new Values(log.getId(),log.getKey(),log.getMobilePhoneNo(),log.getCode(),log.getState(),log.getReturnMsg(),log.getPostTime(),log.getCreatedOn()));
         }
@@ -64,7 +64,7 @@ public class SMSLogTopology {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         final String topic = "UBUserSMSLog";
-        final String spoutId = "ubusersmslog_storm";
+        final String spoutId = "ubusersmslogstorm";
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(topic, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,spoutId);
 
         // use "|" instead of "," for field delimiter
@@ -73,7 +73,7 @@ public class SMSLogTopology {
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 1MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/").withExtension(".txt");
         HdfsBolt bolt = new HdfsBolt()
                 .withFsUrl(MyConfig.HDFS_URL)
                 .withFileNameFormat(fileNameFormat)

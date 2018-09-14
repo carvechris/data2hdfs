@@ -6,14 +6,18 @@ import com.zhishinet.MyConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.storm.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 
+
 public class KakfaProceduer {
+
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
 
     public static void main(String[] args) throws InterruptedException, JsonProcessingException {
         Properties props = new Properties();
@@ -37,14 +41,15 @@ public class KakfaProceduer {
         ubUserSMSLogMap.put(1, ubUserSMSLog1);
         ubUserSMSLogMap.put(2, ubUserSMSLog2);
         ubUserSMSLogMap.put(3, ubUserSMSLog3);
-
-        for (int i = 1; i <= 3; i++) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String value = objectMapper.writeValueAsString(ubUserSMSLogMap.get(i));
-            ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic, value);
-            procuder.send(msg);
+        while(1==1) {
+            for (int i = 1; i <= 3; i++) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String value = objectMapper.writeValueAsString(ubUserSMSLogMap.get(i));
+                ProducerRecord<String, String> msg = new ProducerRecord<String, String>(topic, value);
+                logger.debug("topic : {}, value : {}", topic, value);
+                System.out.println("-------");
+                procuder.send(msg);
+            }
         }
-        Utils.sleep(1000);
-        procuder.close();
     }
 }

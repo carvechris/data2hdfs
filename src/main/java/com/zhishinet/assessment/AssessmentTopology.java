@@ -55,6 +55,7 @@ public class AssessmentTopology {
 
         TridentTopology topology = new TridentTopology();
         TridentState state = topology.newStaticState(redisFactory);
+
         Stream stream = topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(kafkaConfig));
         Stream stream1 = stream
                 // 先把Kafka中的数据解析成对象,包括 Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID 字段
@@ -85,31 +86,32 @@ public class AssessmentTopology {
                     )
                     .newValuesStream();
 
-        // 查询已经有的作业班级总分 总提交人数
-        Stream stream2 = stream1
-                .stateQuery(
-                        state,
-                        new Fields(Field.ASSESSMENTID, Field.SESSIONID),
-                        new RedisStateQuerier(assessmentExistsLookupMapper),
-                        new Fields(Field.SUM,Field.COUNT)
-                )
-                .groupBy(
-                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
-                )
-                /**
-                 * 因为根据 Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Test.Field.COUNT 可能会查询出来多条值
-                 * 对这些值进行计数操作之后就只有有一条值，进行镜像操作，去除最后的count
-                 */
-                .persistentAggregate(
-                        new MemoryMapState.Factory(),
-                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT),
-                        new Count(),
-                        new Fields(Field.DISTINCT_RECORDS_FIELD)
-                )
-                .newValuesStream()
-                .project(
-                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
-                );
+
+//        // 查询已经有的作业班级总分 总提交人数
+//        Stream stream2 = stream1
+//                .stateQuery(
+//                        state,
+//                        new Fields(Field.ASSESSMENTID, Field.SESSIONID),
+//                        new RedisStateQuerier(assessmentExistsLookupMapper),
+//                        new Fields(Field.SUM,Field.COUNT)
+//                )
+//                .groupBy(
+//                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
+//                )
+//                /**
+//                 * 因为根据 Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Test.Field.COUNT 可能会查询出来多条值
+//                 * 对这些值进行计数操作之后就只有有一条值，进行镜像操作，去除最后的count
+//                 */
+//                .persistentAggregate(
+//                        new MemoryMapState.Factory(),
+//                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT),
+//                        new Count(),
+//                        new Fields(Field.DISTINCT_RECORDS_FIELD)
+//                )
+//                .newValuesStream()
+//                .project(
+//                        new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
+//                );
         // 消息中的 作业班级总分，总提交人数
         Stream stream3 = topology.join(
                 stream1
@@ -125,27 +127,27 @@ public class AssessmentTopology {
                 new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.SUM,Field.COUNT)
         );
 
-        Stream stream4 = topology.merge(stream2,stream3);
-
-        topology.join(
-                stream4
-                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
-                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.SUM),new Sum(), new Fields(Field.TOTAL_SUM))
-                        .newValuesStream(),
-                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
-                stream4
-                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
-                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.COUNT),new Sum(), new Fields(Field.TOTAL_COUNT))
-                        .newValuesStream(),
-                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
-                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT)
-        )
-        .partitionPersist(
-            redisFactory,
-            new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT),
-            new RedisStateUpdater(assessmentSessionTotalScoreTotalCountStoreMapper),
-            new Fields()
-        );
+//        Stream stream4 = topology.merge(stream2,stream3);
+//
+//        topology.join(
+//                stream4
+//                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
+//                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.SUM),new Sum(), new Fields(Field.TOTAL_SUM))
+//                        .newValuesStream(),
+//                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
+//                stream4
+//                        .groupBy(new Fields(Field.ASSESSMENTID,Field.SESSIONID))
+//                        .persistentAggregate(new MemoryMapState.Factory(),new Fields(Field.COUNT),new Sum(), new Fields(Field.TOTAL_COUNT))
+//                        .newValuesStream(),
+//                        new Fields(Field.ASSESSMENTID,Field.SESSIONID),
+//                new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT)
+//        )
+//        .partitionPersist(
+//            redisFactory,
+//            new Fields(Field.ASSESSMENTID,Field.SESSIONID,Field.TOTAL_SUM,Field.TOTAL_COUNT),
+//            new RedisStateUpdater(assessmentSessionTotalScoreTotalCountStoreMapper),
+//            new Fields()
+//        );
         LocalCluster cluster = new LocalCluster();
         Config config = new Config();
 //        config.setNumWorkers(2);

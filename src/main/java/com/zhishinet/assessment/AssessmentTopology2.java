@@ -87,7 +87,7 @@ public class AssessmentTopology2 {
         LocalDRPC drpc = new LocalDRPC();
         topology.newDRPCStream("SumAndCount", drpc)
                 .each(new Fields("args"), new CustomSplit(), new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID), new Debug(true))
+                .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID), new Debug("true"))
                 .stateQuery(tridentState, new Fields(Field.ASSESSMENTID,Field.SESSIONID), new RedisMapGet(), new Fields("SumAndCount"));
 
 
