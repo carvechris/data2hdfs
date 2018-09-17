@@ -29,6 +29,8 @@ import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Properties;
+
 /**
  * tomaer
  */
@@ -82,13 +84,13 @@ public class AssessmentTopology2 {
                 new Fields()
         );
 
-        //2. 查询计算结果
-        logger.info("===============定义 查询计算结果 =============");
-        LocalDRPC drpc = new LocalDRPC();
-        topology.newDRPCStream("SumAndCount", drpc)
-                .each(new Fields("args"), new CustomSplit(), new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID), new Debug("true"))
-                .stateQuery(tridentState, new Fields(Field.ASSESSMENTID,Field.SESSIONID), new RedisMapGet(), new Fields("SumAndCount"));
+//        //2. 查询计算结果
+//        logger.info("===============定义 查询计算结果 =============");
+//        LocalDRPC drpc = new LocalDRPC();
+//        topology.newDRPCStream("SumAndCount", drpc)
+//                .each(new Fields("args"), new CustomSplit(), new Fields(Field.ASSESSMENTID, Field.SESSIONID))
+//                .each(new Fields(Field.ASSESSMENTID,Field.SESSIONID), new Debug("true"))
+//                .stateQuery(tridentState, new Fields(Field.ASSESSMENTID,Field.SESSIONID), new RedisMapGet(), new Fields("SumAndCount"));
 
 
 
@@ -96,20 +98,34 @@ public class AssessmentTopology2 {
 
         LocalCluster cluster = new LocalCluster();
         Config config = new Config();
+        Config conf = new Config();
+        conf.setDebug(false);
+        Properties props = new Properties();
+        props.put("producer.type","async");
+        props.put("linger.ms","1500");
+        props.put("batch.size","16384");
+        props.put("request.required.acks", "1");
+//        props.put("serializer.class", "kafka.serializer.JsonEnscoder");
+        props.put("key.deserializer",   "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE,            32);
+        conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
+        conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE,    16384);
+        conf.put("kafka.broker.properties", props);
 //        config.setNumWorkers(2);
         cluster.submitTopology("TridentTopology",config,topology.build());
 
 
-        try {
-            logger.info("===============测试 topology =============");
-            Thread.sleep(2000);
-            for(int i=0;i< 100 ; i++){
-                logger.info("=============== print result per 2 second: " + drpc.execute("SumAndCount", "389259,129678 389245,129678 199927,44776"));
-                Thread.sleep(1000);
-            }
-        }catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            logger.info("===============测试 topology =============");
+//            Thread.sleep(2000);
+//            for(int i=0;i< 100 ; i++){
+//                logger.info("=============== print result per 2 second: " + drpc.execute("SumAndCount", "389259,129678 389245,129678 199927,44776"));
+//                Thread.sleep(1000);
+//            }
+//        }catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }
