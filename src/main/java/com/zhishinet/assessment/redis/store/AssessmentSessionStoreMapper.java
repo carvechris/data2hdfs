@@ -26,11 +26,14 @@ public class AssessmentSessionStoreMapper implements RedisStoreMapper {
 
     @Override
     public String getKeyFromTuple(ITuple tuple) {
+        logger.info("=============== getKeyFromTuple assessmentId: {}, sessionId: {}", tuple.getIntegerByField(Field.ASSESSMENTID), tuple.getIntegerByField(Field.SESSIONID) );
         return REDIS_KEY_PREFIX + Field.ASSESSMENTID + "_" + tuple.getIntegerByField(Field.ASSESSMENTID) + ":" + Field.SESSIONID + "_" + tuple.getIntegerByField(Field.SESSIONID);
     }
 
     @Override
     public String getValueFromTuple(ITuple tuple) {
+        logger.info("=============== getValueFromTuple sum: {}, count: {}", tuple.getDoubleByField(Field.SUM), tuple.getLongByField(Field.COUNT) );
+
         return tuple.getDoubleByField(Field.SUM) + "_" + tuple.getLongByField(Field.COUNT);
     }
 }
