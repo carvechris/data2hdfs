@@ -1,13 +1,10 @@
 package com.zhishinet.assessment;
 
 
-import com.zhishinet.assessment.baseFunction.CustomSplit;
-import com.zhishinet.assessment.baseQueryFunction.RedisMapGet;
 import com.zhishinet.assessment.redis.store.AssessmentSessionStoreMapper;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
-import org.apache.storm.LocalDRPC;
 import org.apache.storm.kafka.BrokerHosts;
 import org.apache.storm.kafka.StringScheme;
 import org.apache.storm.kafka.ZkHosts;
@@ -22,7 +19,6 @@ import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.builtin.Count;
-import org.apache.storm.trident.operation.builtin.Debug;
 import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.testing.MemoryMapState;
 import org.apache.storm.tuple.Fields;

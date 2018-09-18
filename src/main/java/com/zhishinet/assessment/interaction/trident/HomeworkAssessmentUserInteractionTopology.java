@@ -22,7 +22,6 @@ import org.apache.storm.hdfs.trident.format.RecordFormat;
 import org.apache.storm.hdfs.trident.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.trident.rotation.FileSizeRotationPolicy;
 import org.apache.storm.kafka.trident.TransactionalTridentKafkaSpout;
-import org.apache.storm.kafka.trident.TridentKafkaConfig;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.BaseFunction;
 import org.apache.storm.trident.operation.TridentCollector;
@@ -125,7 +124,7 @@ public class HomeworkAssessmentUserInteractionTopology {
         StateFactory factory = new HdfsStateFactory().withOptions(options);
 
         TridentTopology topology = new TridentTopology();
-        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout((TridentKafkaConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID))).parallelismHint(3)
+        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(MyConfig.getTridentKafkaConfig(TOPIC, MyConfig.ZK_HOSTS, SPOUTID))).parallelismHint(3)
                 .each(new Fields("str"),new SplitData(),Field.kafkaMessageFields).parallelismHint(3)
                 .partitionPersist(factory, Field.kafkaMessageFields, new HdfsUpdater(), new Fields()).parallelismHint(3);
 
