@@ -2,6 +2,7 @@ package com.zhishinet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
+import org.apache.storm.kafka.KafkaConfig;
 import org.apache.storm.kafka.SpoutConfig;
 import org.apache.storm.kafka.StringScheme;
 import org.apache.storm.kafka.ZkHosts;
@@ -26,7 +27,7 @@ public class MyConfig {
     public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
 //    public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
 
-    public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
+    public static KafkaConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);
         SpoutConfig spoutConfig = new SpoutConfig(zkHosts, topic, zkRoot, spoutId);
         List<String> zkServers = new ArrayList<>() ;

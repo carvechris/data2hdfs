@@ -1,9 +1,17 @@
-package com.zhishinet.assessment1.interaction;
+package com.zhishinet.assessment1.interaction.bolt;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zhishinet.MyConfig;
+import com.zhishinet.assessment1.interaction.Field;
+import com.zhishinet.assessment1.interaction.HomeworkAssessmentUserInteraction;
 import org.apache.commons.lang.StringUtils;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
 import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
@@ -13,13 +21,13 @@ import org.apache.storm.hdfs.bolt.rotation.FileRotationPolicy;
 import org.apache.storm.hdfs.bolt.rotation.FileSizeRotationPolicy;
 import org.apache.storm.hdfs.bolt.sync.CountSyncPolicy;
 import org.apache.storm.hdfs.bolt.sync.SyncPolicy;
+import org.apache.storm.kafka.KafkaSpout;
 import org.apache.storm.kafka.SpoutConfig;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
@@ -33,29 +41,6 @@ public class HomeworkAssessmentUserInteractionTopology {
     public static final String TOPIC = "HomeworkAssessmentUserInteraction";
     public static final String SPOUT_ID = "homeworkassessmentuserinteractionstorm";
 
-    public static class Field {
-        private static final String HOMEWORKASSESSMENTUSERINTERACTIONID = "homeworkAssessmentUserInteractionId", HOMEWORKSESSIONUSERTRACKINGID = "homeworkSessionUserTrackingId";
-        private static final String HOMEWORKASSESSMENTID = "homeworkAssessmentId", QUESTIONID = "questionId";
-        private static final String CORRECTRESPONSE = "correctResponse", USERRESPONSE = "userResponse";
-        private static final String INTERACTIONDATE = "interactionDate", ATTEMPTNO = "attemptNo";
-        private static final String INTERACTIONTIMESPENT = "interactionTimeSpent", USERSCORE = "userScore";
-        private static final String TEXTUSERRESPONSE = "textUserResponse", FEEDBACKVIEWED = "feedbackViewed";
-        private static final String CREATEDON = "createdOn", CREATEDBY = "createdBy";
-        private static final String MODIFIEDON = "modifiedOn", MODIFIEDBY = "modifiedBy";
-        private static final String DELETEDON = "deletedOn", DELETEDBY = "deletedBy", DELETED = "deleted";
-        private static final String QUESTIONANSWER = "questionAnswer", READCOUNT = "readCount";
-        private static final String STANDARDSCORE = "standardScore", AUDIOPATH = "audioPath";
-        private static final String ORALSCORE = "oralScore", GUESSWORDTIMESPENT = "guessWordTimeSpent";
-    }
-
-    public static final Fields kafkaMessageFields = new Fields(
-            Field.HOMEWORKASSESSMENTUSERINTERACTIONID, Field.HOMEWORKSESSIONUSERTRACKINGID,
-            Field.HOMEWORKASSESSMENTID, Field.QUESTIONID, Field.CORRECTRESPONSE,
-            Field.USERRESPONSE, Field.INTERACTIONDATE, Field.ATTEMPTNO, Field.INTERACTIONTIMESPENT, Field.USERSCORE,
-            Field.TEXTUSERRESPONSE, Field.FEEDBACKVIEWED, Field.CREATEDON, Field.CREATEDBY, Field.MODIFIEDON, Field.MODIFIEDBY,
-            Field.DELETEDON, Field.DELETEDBY, Field.DELETED, Field.QUESTIONANSWER,
-            Field.READCOUNT, Field.STANDARDSCORE, Field.AUDIOPATH, Field.ORALSCORE, Field.GUESSWORDTIMESPENT
-    );
     private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
@@ -135,28 +120,35 @@ public class HomeworkAssessmentUserInteractionTopology {
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(kafkaMessageFields);
+            outputFieldsDeclarer.declare(Field.kafkaMessageFields);
         }
     }
 
-
-
-    public static void main(String[] args) {
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,SPOUT_ID);
-
+    public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
+        SpoutConfig spoutConfig = (SpoutConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,SPOUT_ID);
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
-        // sync the filesystem after every 100 tuples
-        SyncPolicy syncPolicy = new CountSyncPolicy(100);
+        // sync the filesystem after every 1000 tuples
+        SyncPolicy syncPolicy = new CountSyncPolicy(1000);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
+        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
+
         TopologyBuilder builder = new TopologyBuilder();
-//        builder.setSpout();
+        builder.setSpout("kafkaSpout",kafkaSpout,3);
+        builder.setBolt("splitDataBolt", new SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt", hdfsBolt,3).shuffleGrouping("splitDataBolt");
+
+        Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
+        if(null != args && args.length > 0) {
+            config.setNumWorkers(3);
+            StormSubmitter.submitTopology("HomeworkAssessmentUserInteractionTopology", config, builder.createTopology());
+        } else {
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology("HomeworkAssessmentUserInteractionTopology",config,builder.createTopology());
+        }
     }
-
-
-
 }
