@@ -1,10 +1,10 @@
-package com.zhishinet.assessment1.interaction.trident;
+package com.zhishinet.assessment.interaction.trident;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zhishinet.MyConfig;
-import com.zhishinet.assessment1.interaction.Field;
-import com.zhishinet.assessment1.interaction.HomeworkAssessmentUserInteraction;
+import com.zhishinet.assessment.interaction.Field;
+import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;

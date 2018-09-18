@@ -1,4 +1,4 @@
-package com.zhishinet.assessment1.interaction;
+package com.zhishinet.assessment.interaction;
 
 import org.apache.storm.tuple.Fields;
 
