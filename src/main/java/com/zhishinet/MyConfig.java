@@ -48,7 +48,7 @@ public class MyConfig {
         props.put("linger.ms","1500");
         props.put("batch.size","16384");
         props.put("request.required.acks", "1");
-        props.put("serializer.encoding","utf-8");
+        props.put("deserializer.encoding","UTF8");
         props.put("key.deserializer",   "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE,            32);

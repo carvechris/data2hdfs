@@ -31,6 +31,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class SMSLogTopology {
@@ -49,7 +50,6 @@ public class SMSLogTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            logger.info("message: {}",json);
             UBUserSMSLog log = gson.fromJson(json, UBUserSMSLog.class);
             this.collector.ack(tuple);
             this.collector.emit(new Values(log.getId(),log.getKey(),log.getMobilePhoneNo(),log.getCode(),log.getState(),log.getReturnMsg(),log.getPostTime(),log.getCreatedOn()));
