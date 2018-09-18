@@ -39,8 +39,8 @@ import java.util.Objects;
 public class HomeworkAssessmentUserInteractionTopology {
 
     public static final String TOPIC = "HomeworkAssessmentUserInteraction";
-    public static final String SPOUT_ID = "homeworkassessmentuserinteractionstorm";
-
+    public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
+    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionTopology";
     private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
@@ -125,10 +125,10 @@ public class HomeworkAssessmentUserInteractionTopology {
     }
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        SpoutConfig spoutConfig = (SpoutConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,SPOUT_ID);
+        SpoutConfig spoutConfig = (SpoutConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         // sync the filesystem after every 1000 tuples
-        SyncPolicy syncPolicy = new CountSyncPolicy(1000);
+        SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128.0f, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
@@ -145,10 +145,10 @@ public class HomeworkAssessmentUserInteractionTopology {
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
             config.setNumWorkers(3);
-            StormSubmitter.submitTopology("HomeworkAssessmentUserInteractionTopology", config, builder.createTopology());
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("HomeworkAssessmentUserInteractionTopology",config,builder.createTopology());
+            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
         }
     }
 }

@@ -37,16 +37,16 @@ import java.util.Objects;
 
 public class HomeworkAssessmentUserInteractionTopology {
 
-    private static Logger logger = LoggerFactory.getLogger(HomeworkAssessmentUserInteractionTopology.class);
     public static final String TOPIC = "HomeworkAssessmentUserInteraction";
-    public static final String SPOUT_ID = "homeworkassessmentuserinteractionstorm";
+    public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
+    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionTopology";
 
     private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitData extends BaseFunction {
         private static final Logger logger = LoggerFactory.getLogger(SplitData.class);
         @Override
-        public void execute(TridentTuple tuple, TridentCollector tridentCollector) {
+        public void execute(TridentTuple tuple, TridentCollector collector) {
             logger.info("StartParsing data from json to fields");
             final String json = tuple.getString(0);
             HomeworkAssessmentUserInteraction haui = gson.fromJson(json, HomeworkAssessmentUserInteraction.class);
@@ -104,7 +104,7 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add(StringUtils.isNotBlank(haui.getAudioPath()) ? haui.getAudioPath() : "\\N");
                 values.add((!Objects.isNull(haui.getOralScore())) ? haui.getOralScore() : "\\N");
                 values.add((!Objects.isNull(haui.getGuessWordTimeSpent())) ? haui.getGuessWordTimeSpent() : "\\N");
-                tridentCollector.emit(values);
+                collector.emit(values);
             }
         }
     }
@@ -125,17 +125,17 @@ public class HomeworkAssessmentUserInteractionTopology {
         StateFactory factory = new HdfsStateFactory().withOptions(options);
 
         TridentTopology topology = new TridentTopology();
-        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout((TridentKafkaConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,SPOUT_ID))).parallelismHint(3)
+        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout((TridentKafkaConfig) MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID))).parallelismHint(3)
                 .each(new Fields("str"),new SplitData(),Field.kafkaMessageFields).parallelismHint(3)
                 .partitionPersist(factory, Field.kafkaMessageFields, new HdfsUpdater(), new Fields()).parallelismHint(3);
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
             config.setNumWorkers(3);
-            StormSubmitter.submitTopology("HomeworkAssessmentUserInteractionTopology", config, topology.build());
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology.build());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("HomeworkAssessmentUserInteractionTopology",config,topology.build());
+            cluster.submitTopology(TOPOLOGY_NAME,config,topology.build());
         }
     }
 }
