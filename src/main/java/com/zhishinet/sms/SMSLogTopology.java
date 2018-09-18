@@ -64,7 +64,7 @@ public class SMSLogTopology {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         final String topic = "UBUserSMSLog";
         final String spoutId = "ubusersmslogstorm";
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(topic, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,spoutId);
+        SpoutConfig spoutConfig = (SpoutConfig) MyConfig.getKafkaSpoutConfig(topic, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,spoutId);
 
         // use "|" instead of "," for field delimiter
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
