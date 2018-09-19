@@ -2,7 +2,7 @@ package com.zhishinet.sms.trident;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zhishinet.MyConfig;
+import com.hand.zhishinet.MyConfig;
 import com.zhishinet.sms.Field;
 import com.zhishinet.sms.UBUserSMSLog;
 import org.apache.commons.lang.StringUtils;

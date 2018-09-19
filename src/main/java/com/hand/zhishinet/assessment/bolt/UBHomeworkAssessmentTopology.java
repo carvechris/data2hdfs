@@ -2,9 +2,9 @@ package com.hand.zhishinet.assessment.bolt;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zhishinet.MyConfig;
-import com.zhishinet.sms.Field;
-import com.zhishinet.sms.UBUserSMSLog;
+import com.hand.zhishinet.assessment.Field;
+import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
+import com.hand.zhishinet.MyConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -41,6 +41,7 @@ public class UBHomeworkAssessmentTopology {
     public static final String TOPIC = "UBHomeworkAssessment";
     public static final String SPOUTID = "ubhomeworkassessmentstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkAssessmentTopology";
+
     private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
@@ -56,67 +57,114 @@ public class UBHomeworkAssessmentTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBUserSMSLog log = gson.fromJson(json, UBUserSMSLog.class);
-            if (Objects.isNull(log)) {
+            UBHomeworkAssessment assessment = gson.fromJson(json, UBHomeworkAssessment.class);
+            if (Objects.isNull(assessment)) {
                 this.outputCollector.fail(tuple);
             } else {
+                //1.验证必需字段
                 Values values = new Values();
-
-                if(null == log.getId() || log.getId() <= 0) {
-                    logger.error("The message from kafka id is inValidate : {}", json);
+                if(null == assessment.getHomeworkAssessmentId() || assessment.getHomeworkAssessmentId() <= 0) {
+                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka id is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
                 }
-                values.add(log.getId());
+                values.add(assessment.getHomeworkAssessmentId());
 
-                if(StringUtils.isBlank(log.getKey())) {
-                    logger.error("The message from kafka key is inValidate : {}", json);
+                if(StringUtils.isBlank(assessment.getTitle())) {
+                    logger.error("The message from kafka title is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka key is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka title is inValidate ");
                 }
-                values.add(log.getKey());
+                values.add(assessment.getTitle());
 
-                if(StringUtils.isBlank(log.getMobilePhoneNo())) {
-                    logger.error("The message from kafka mobilePhoneNo is inValidate : {}", json);
+                if(null == assessment.getTenantId() || assessment.getTenantId() <= 0) {
+                    logger.error("The message from kafka tenantId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka mobilePhoneNo is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka tenantId is inValidate ");
                 }
-                values.add(log.getMobilePhoneNo());
+                values.add(assessment.getTenantId());
 
-                if(StringUtils.isBlank(log.getCode())) {
-                    logger.error("The message from kafka code is inValidate : {}", json);
+                if(null == assessment.getTimerOn()) {
+                    logger.error("The message from kafka isTimerOn is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka code is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka isTimerOn is inValidate ");
                 }
-                values.add(log.getCode());
+                values.add(assessment.getTimerOn());
 
-                if(null == log.getState() || log.getState() <= 0) {
-                    logger.error("The message from kafka state is inValidate : {}", json);
+                if(null == assessment.getTimerMode() || assessment.getTimerMode() <= 0) {
+                    logger.error("The message from kafka timerMode is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka state is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka timerMode is inValidate ");
                 }
-                values.add(log.getState());
+                values.add(assessment.getTimerMode());
 
-                values.add(StringUtils.isNotBlank(log.getReturnMsg()) ? log.getReturnMsg() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getPostTime()) ? log.getPostTime() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
-                values.add((!Objects.isNull(log.getCreatedBy())) ? log.getCreatedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getModifiedOn()) ? log.getModifiedOn() : "\\N");
-                values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getDeletedOn()) ? log.getDeletedOn() : "\\N");
-                values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
-                values.add(log.isDeleted());
-                values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
+                if(null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() <= 0) {
+                    logger.error("The message from kafka assessmentQuestions is inValidate : {}", json);
+                    this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka assessmentQuestions is inValidate ");
+                }
+                values.add(assessment.getAssessmentQuestions());
+
+                if(null == assessment.getDeleted()) {
+                    logger.error("The message from kafka isDeleted is inValidate : {}", json);
+                    this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka isDeleted is inValidate ");
+                }
+                values.add(assessment.getDeleted());
+
+                if(null == assessment.getTemplateType() || assessment.getTemplateType() <= 0) {
+                    logger.error("The message from kafka templateType is inValidate : {}", json);
+                    this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka templateType is inValidate ");
+                }
+                values.add(assessment.getTemplateType());
+
+                if(null == assessment.getAssessmentBuilderType() || assessment.getAssessmentBuilderType() <= 0) {
+                    logger.error("The message from kafka assessmentBuilderType is inValidate : {}", json);
+                    this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka assessmentBuilderType is inValidate ");
+                }
+                values.add(assessment.getAssessmentBuilderType());
+
+                if(null == assessment.getOptionRandom()) {
+                    logger.error("The message from kafka isOptionRandom is inValidate : {}", json);
+                    this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka isOptionRandom is inValidate ");
+                }
+                values.add(assessment.getOptionRandom());
+
+                values.add(!Objects.isNull(assessment.getMinimumPassPercentage()) ? assessment.getMinimumPassPercentage() : "\\N");
+                values.add(!Objects.isNull(assessment.getBeginDate()) ? assessment.getBeginDate() : "\\N");
+                values.add(!Objects.isNull(assessment.getEndDate()) ? assessment.getEndDate() : "\\N");
+                values.add(!Objects.isNull(assessment.getAssessmentClassification()) ? assessment.getAssessmentClassification() : "\\N");
+                values.add(!Objects.isNull(assessment.getDuration()) ? assessment.getDuration() : "\\N");
+                values.add(!Objects.isNull(assessment.getAllowBack()) ? assessment.getAllowBack() : "\\N");
+                values.add(!Objects.isNull(assessment.getAllowSkip()) ? assessment.getAllowSkip() : "\\N");
+                values.add(!Objects.isNull(assessment.getDisableFeedback()) ? assessment.getDisableFeedback() : "\\N");
+                values.add(!Objects.isNull(assessment.getAssessmentBuilderType()) ? assessment.getAssessmentBuilderType() : "\\N");
+                values.add(!Objects.isNull(assessment.getSubjectId()) ? assessment.getSubjectId() : "\\N");
+                values.add(!Objects.isNull(assessment.getOral()) ? assessment.getOral() : "\\N");
+                values.add(!Objects.isNull(assessment.getShowSubTitle()) ? assessment.getShowSubTitle() : "\\N");
+                values.add(!Objects.isNull(assessment.getDisplayOrder()) ? assessment.getDisplayOrder() : "\\N");
+                values.add(!Objects.isNull(assessment.getTextbookId()) ? assessment.getTextbookId() : "\\N");
+                values.add(!Objects.isNull(assessment.getTextbookSeriesId()) ? assessment.getTextbookSeriesId() : "\\N");
+                values.add(StringUtils.isNotBlank(assessment.getIntroText()) ? assessment.getIntroText() : "\\N");
+
+                values.add(!Objects.isNull(assessment.getCreatedBy()) ? assessment.getCreatedBy() : "\\N");
+                values.add(!Objects.isNull(assessment.getCreatedOn()) ? assessment.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(assessment.getModifiedBy()) ? assessment.getModifiedBy() : "\\N");
+                values.add(!Objects.isNull(assessment.getModifiedOn()) ? assessment.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(assessment.getDeletedBy()) ? assessment.getDeletedBy() : "\\N");
+                values.add(!Objects.isNull(assessment.getDeletedOn()) ? assessment.getDeletedOn() : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
-
             }
         }
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(Field.kafkaMessageFields);
+            outputFieldsDeclarer.declare(Field.getHomeworkAssessmentFields());
         }
     }
 
@@ -127,7 +175,7 @@ public class UBHomeworkAssessmentTopology {
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessment/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 

@@ -1,4 +1,4 @@
-package com.zhishinet;
+package com.hand.zhishinet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;

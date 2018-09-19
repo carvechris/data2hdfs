@@ -1,5 +1,7 @@
 package com.hand.zhishinet.assessment.vo;
 
+import org.apache.storm.tuple.Fields;
+
 import java.util.Date;
 
 /**
@@ -8,12 +10,16 @@ import java.util.Date;
  * @name zhishinet-bigData
  * @description
  */
-public class UBHomeworkAssessment extends BaseDTO{
+public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializable {
+
+    private static final long serialVersionUID = 11158919214416098L;
 
     private Long homeworkAssessmentId;
+    private String title;
+    private String introText;
     private Integer tenantId;
     private Boolean isTimerOn;
-    private Short timerMode;
+    private Integer timerMode;
     private Integer minimumPassPercentage;
     private Integer assessmentQuestions;
     private Date beginDate;
@@ -31,7 +37,8 @@ public class UBHomeworkAssessment extends BaseDTO{
     private Boolean isOral;
     private Boolean showSubTitle;
     private Integer displayOrder;
-    private String homeworkAssessmentJson;
+    private Integer textbookSeriesId;
+    private Integer textbookId;
 
     public Long getHomeworkAssessmentId() {
         return homeworkAssessmentId;
@@ -57,11 +64,11 @@ public class UBHomeworkAssessment extends BaseDTO{
         isTimerOn = timerOn;
     }
 
-    public Short getTimerMode() {
+    public Integer getTimerMode() {
         return timerMode;
     }
 
-    public void setTimerMode(Short timerMode) {
+    public void setTimerMode(Integer timerMode) {
         this.timerMode = timerMode;
     }
 
@@ -201,11 +208,36 @@ public class UBHomeworkAssessment extends BaseDTO{
         this.displayOrder = displayOrder;
     }
 
-    public String getHomeworkAssessmentJson() {
-        return homeworkAssessmentJson;
+    public String getTitle() {
+        return title;
     }
 
-    public void setHomeworkAssessmentJson(String homeworkAssessmentJson) {
-        this.homeworkAssessmentJson = homeworkAssessmentJson;
+    public void setTitle(String title) {
+        this.title = title;
     }
+
+    public String getIntroText() {
+        return introText;
+    }
+
+    public void setIntroText(String introText) {
+        this.introText = introText;
+    }
+
+    public Integer getTextbookSeriesId() {
+        return textbookSeriesId;
+    }
+
+    public void setTextbookSeriesId(Integer textbookSeriesId) {
+        this.textbookSeriesId = textbookSeriesId;
+    }
+
+    public Integer getTextbookId() {
+        return textbookId;
+    }
+
+    public void setTextbookId(Integer textbookId) {
+        this.textbookId = textbookId;
+    }
+
 }

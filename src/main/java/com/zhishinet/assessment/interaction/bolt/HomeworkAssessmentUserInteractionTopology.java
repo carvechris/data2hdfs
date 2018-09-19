@@ -2,7 +2,7 @@ package com.zhishinet.assessment.interaction.bolt;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zhishinet.MyConfig;
+import com.hand.zhishinet.MyConfig;
 import com.zhishinet.assessment.interaction.Field;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
 import org.apache.commons.lang.StringUtils;

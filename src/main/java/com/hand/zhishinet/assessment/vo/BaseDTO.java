@@ -15,7 +15,7 @@ public class BaseDTO {
     protected Integer modifiedBy;
     protected Date deletedOn;
     protected Integer deletedBy;
-    protected Boolean deleted;
+    protected Boolean isDeleted;
 
     public Date getCreatedOn() {
         return createdOn;
@@ -66,10 +66,10 @@ public class BaseDTO {
     }
 
     public Boolean getDeleted() {
-        return deleted;
+        return isDeleted;
     }
 
     public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+        isDeleted = deleted;
     }
 }

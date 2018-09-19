@@ -1,10 +1,11 @@
-package com.zhishinet.sms.bolt;
+package com.hand.zhishinet.assessment.bolt;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hand.zhishinet.MyConfig;
-import com.zhishinet.sms.Field;
-import com.zhishinet.sms.UBUserSMSLog;
+import com.hand.zhishinet.assessment.Field;
+import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
+import com.hand.zhishinet.assessment.vo.UBHomeworkAssessmentSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -36,11 +37,12 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.Objects;
 
-public class SMSLogTopology {
+public class UBHomeworkAssessmentSessionTopology {
 
-    public static final String TOPIC = "UBUserSMSLog";
-    public static final String SPOUTID = "ubusersmslogstorm";
-    public static final String TOPOLOGY_NAME = "SMSLogTopology";
+    public static final String TOPIC = "UBHomeworkAssessmentSession";
+    public static final String SPOUTID = "ubhomeworkassessmentsessionstorm";
+    public static final String TOPOLOGY_NAME = "UBHomeworkAssessmentSessionTopology";
+
     private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
@@ -56,67 +58,61 @@ public class SMSLogTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBUserSMSLog log = gson.fromJson(json, UBUserSMSLog.class);
-            if (Objects.isNull(log)) {
+            UBHomeworkAssessmentSession assessmentSession = gson.fromJson(json, UBHomeworkAssessmentSession.class);
+            if (Objects.isNull(assessmentSession)) {
                 this.outputCollector.fail(tuple);
             } else {
+                //1.验证必需字段
                 Values values = new Values();
-
-                if(null == log.getId() || log.getId() <= 0) {
-                    logger.error("The message from kafka id is inValidate : {}", json);
+                if(null == assessmentSession.getHomeworkAssessmentId() || assessmentSession.getHomeworkAssessmentId() <= 0) {
+                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka id is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
                 }
-                values.add(log.getId());
+                values.add(assessmentSession.getHomeworkAssessmentId());
 
-                if(StringUtils.isBlank(log.getKey())) {
-                    logger.error("The message from kafka key is inValidate : {}", json);
+                if(null == assessmentSession.getAssessmentSessionId() || assessmentSession.getAssessmentSessionId() <= 0) {
+                    logger.error("The message from kafka assessmentSessionId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka key is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka assessmentSessionId is inValidate ");
                 }
-                values.add(log.getKey());
+                values.add(assessmentSession.getAssessmentSessionId());
 
-                if(StringUtils.isBlank(log.getMobilePhoneNo())) {
-                    logger.error("The message from kafka mobilePhoneNo is inValidate : {}", json);
+                if(null == assessmentSession.getSessionId() || assessmentSession.getSessionId() <= 0) {
+                    logger.error("The message from kafka sessionId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka mobilePhoneNo is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");
                 }
-                values.add(log.getMobilePhoneNo());
+                values.add(assessmentSession.getSessionId());
 
-                if(StringUtils.isBlank(log.getCode())) {
-                    logger.error("The message from kafka code is inValidate : {}", json);
+                if(StringUtils.isNotBlank(assessmentSession.getEmendTypeCode())) {
+                    logger.error("The message from kafka emendTypeCode is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka code is inValidate ");
+                    throw new IllegalArgumentException("The message from kafka emendTypeCode is inValidate ");
                 }
-                values.add(log.getCode());
+                values.add(assessmentSession.getEmendTypeCode());
 
-                if(null == log.getState() || log.getState() <= 0) {
-                    logger.error("The message from kafka state is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka state is inValidate ");
-                }
-                values.add(log.getState());
+                values.add(!Objects.isNull(assessmentSession.getClose()) ? assessmentSession.getClose() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getRequire()) ? assessmentSession.getRequire() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getRequiredEmend()) ? assessmentSession.getRequiredEmend() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getDeleted()) ? assessmentSession.getDeleted() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getSessionGroupId()) ? assessmentSession.getSessionGroupId() : "\\N");
 
-                values.add(StringUtils.isNotBlank(log.getReturnMsg()) ? log.getReturnMsg() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getPostTime()) ? log.getPostTime() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
-                values.add((!Objects.isNull(log.getCreatedBy())) ? log.getCreatedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getModifiedOn()) ? log.getModifiedOn() : "\\N");
-                values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getDeletedOn()) ? log.getDeletedOn() : "\\N");
-                values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
-                values.add(log.isDeleted());
-                values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
+                values.add(!Objects.isNull(assessmentSession.getCreatedBy()) ? assessmentSession.getCreatedBy() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getCreatedOn()) ? assessmentSession.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getModifiedBy()) ? assessmentSession.getModifiedBy() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getModifiedOn()) ? assessmentSession.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getDeletedBy()) ? assessmentSession.getDeletedBy() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getDeletedOn()) ? assessmentSession.getDeletedOn() : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
-
             }
         }
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(Field.kafkaMessageFields);
+            outputFieldsDeclarer.declare(Field.getHomeworkAssessmentSessionFields());
         }
     }
 
@@ -127,7 +123,7 @@ public class SMSLogTopology {
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentSession/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
