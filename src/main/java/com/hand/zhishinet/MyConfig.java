@@ -25,6 +25,7 @@ public class MyConfig {
 //    public static final String KAFKA_BROKERS = "172.30.74.239:6667,172.30.74.240:6667,172.30.74.241:6667";
 //    public static final String KAFKA_BROKERS = "127.0.0.1:9092";
     public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
+//    public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020,hdfs://bigdata-ambari-agent-2:8020，hdfs://bigdata-ambari-agent-3:8020";
 //    public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
