@@ -4,6 +4,7 @@ package com.hand.zhishinet.assessment.vo;
  */
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,8 +13,9 @@ import java.util.Date;
  */
 
 
-public class UBHomeworkSessionUserTracking extends BaseDTO {
+public class UBHomeworkSessionUserTracking  implements Serializable {
 
+    private static final long serialVersionUID = 4898677768856561034L;
     private Long homeworkSessionUserTrackingId;
 
     private Integer sessionId;
@@ -40,7 +42,7 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
 
     private Date endDate;
 
-    private String timeSpent;
+    private Long timeSpent;
 
     private String interactionTimer;
 
@@ -50,7 +52,7 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
 
     private Boolean isChecked;
 
-    private Short forLearnerStatus;
+    private Integer forLearnerStatus;
 
     private String questionIndexs;
 
@@ -70,8 +72,19 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
 
     private Integer displayOrder;
 
-    public UBHomeworkSessionUserTracking() {
-    }
+    private Date createdOn;
+
+    private Integer createdBy;
+
+    private Date modifiedOn;
+
+    private Integer modifiedBy;
+
+    private Date deletedOn;
+
+    private Integer deletedBy;
+
+    private Boolean deleted = false;
 
     public Long getHomeworkSessionUserTrackingId() {
         return homeworkSessionUserTrackingId;
@@ -177,11 +190,11 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
         this.endDate = endDate;
     }
 
-    public String getTimeSpent() {
+    public Long getTimeSpent() {
         return timeSpent;
     }
 
-    public void setTimeSpent(String timeSpent) {
+    public void setTimeSpent(Long timeSpent) {
         this.timeSpent = timeSpent;
     }
 
@@ -217,11 +230,11 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
         isChecked = checked;
     }
 
-    public Short getForLearnerStatus() {
+    public Integer getForLearnerStatus() {
         return forLearnerStatus;
     }
 
-    public void setForLearnerStatus(Short forLearnerStatus) {
+    public void setForLearnerStatus(Integer forLearnerStatus) {
         this.forLearnerStatus = forLearnerStatus;
     }
 
@@ -295,5 +308,61 @@ public class UBHomeworkSessionUserTracking extends BaseDTO {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(Date modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public Integer getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(Integer modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Date getDeletedOn() {
+        return deletedOn;
+    }
+
+    public void setDeletedOn(Date deletedOn) {
+        this.deletedOn = deletedOn;
+    }
+
+    public Integer getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(Integer deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

@@ -59,7 +59,8 @@ public class UBHomeworkSessionUserTrackingTopology {
                     log.getPercentScore(),log.getCompleteAttempts(),log.getBeginDate(),log.getEndDate(),log.getTimeSpent(),
                     log.getInteractionTimer(),log.getArticleLocation(),log.getLocation(),log.getChecked(),log.getForLearnerStatus(),log.getQuestionIndexs(),
                     log.getEmendStatus(),log.getRequiredEmend(),log.getSubjectId(),log.getReadCount(),log.getShowSubTitle(),log.getEmendTypeCode(),
-                    log.getSessionGroupId(),log.getDisplayOrder()));
+                    log.getSessionGroupId(),log.getDisplayOrder(),log.getCreatedOn(),log.getCreatedBy(),log.getModifiedOn(),log.getModifiedBy(),log.getDeletedOn(),
+                    log.getDeletedBy(),log.getDeleted()));
         }
 
         @Override
@@ -67,7 +68,8 @@ public class UBHomeworkSessionUserTrackingTopology {
             outputFieldsDeclarer.declare(new Fields("homeworkSessionUserTrackingId","sessionId","homeworkAssessmentId","userId","noOfVisits",
                     "lastViewedOn","statusId","completedOn","score","percentScore","completeAttempts","beginDate","endDate","timeSpent",
                     "interactionTimer","articleLocation","location","isChecked","forLearnerStatus","questionIndexs","emendStatus","IsRequiredEmend",
-                    "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder"));
+                    "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
+                    "modifiedBy","deletedOn","deletedBy","deleted"));
         }
     }
 
