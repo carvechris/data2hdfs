@@ -148,16 +148,16 @@
 
         <!-- mongo -->
 
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>3.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>3.4.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.mongodb</groupId>-->
+            <!--<artifactId>mongo-java-driver</artifactId>-->
+            <!--<version>3.4.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.mongodb</groupId>-->
+            <!--<artifactId>bson</artifactId>-->
+            <!--<version>3.4.1</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -166,8 +166,7 @@
         <dependency>
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-mongodb</artifactId>
-            <version>1.2.2</version>
-            <scope>${provided.scope}</scope>
+            <version>${storm.version}</version>
         </dependency>
 
         <!-- hbase-->
