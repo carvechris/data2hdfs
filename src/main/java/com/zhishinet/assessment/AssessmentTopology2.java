@@ -7,6 +7,10 @@ import com.zhishinet.assessment.stateFactory.CustomMongoStateFactory;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hbase.trident.mapper.SimpleTridentHBaseMapMapper;
 import org.apache.storm.hbase.trident.state.HBaseMapState;
 import org.apache.storm.kafka.BrokerHosts;
@@ -39,7 +43,7 @@ public class AssessmentTopology2 {
     private static Logger logger = LoggerFactory.getLogger(AssessmentTopology2.class);
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 
         BrokerHosts boBrokerHosts = new ZkHosts(Conf.ZOOKEEPER_LIST);
         final String spoutId = "HomeworkCenter_storm";
@@ -60,27 +64,23 @@ public class AssessmentTopology2 {
 
         //HBase存储中间结果
         //HBaseState使用HBaseMapState
-        HBaseMapState.Options sumHbaseOptions = new HBaseMapState.Options();
-        sumHbaseOptions.tableName = "AssessmentDetails";
-        sumHbaseOptions.columnFamily = "Aggregate";
-        sumHbaseOptions.mapMapper = new SimpleTridentHBaseMapMapper("sum");
+        HBaseMapState.Options sumOptions = new HBaseMapState.Options();
+        sumOptions.tableName = "Assessment";
+        sumOptions.columnFamily = "CompletePercent";
+        sumOptions.mapMapper = new SimpleTridentHBaseMapMapper("sum");
 
-        HBaseMapState.Options countHbaseOptions = new HBaseMapState.Options();
-        countHbaseOptions.tableName = "AssessmentDetails";
-        countHbaseOptions.columnFamily = "Aggregate";
-        countHbaseOptions.mapMapper = new SimpleTridentHBaseMapMapper("count");
-//        CustomKeyFactory keyFactory = new CustomKeyFactory();
-//        StateFactory redisStateFactory = HBaseMapState.transactional();
+        HBaseMapState.Options countOptions = new HBaseMapState.Options();
+        countOptions.tableName = "Assessment";
+        countOptions.columnFamily = "CompletePercent";
+        countOptions.mapMapper = new SimpleTridentHBaseMapMapper("count");
 
-        //HBase存储学生明细
-//        HBaseMapState.transactional(sumHbaseOptions)
 
         //0. 声明拓扑
         TridentTopology topology = new TridentTopology();
 
         //1. 流计算
         //1.1 整理出流中需要的信息
-        Stream stream = topology.newStream("MyConfig", new OpaqueTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream("HomeworkCenter_topology", new TransactionalTridentKafkaSpout(kafkaConfig));
 
 
         Stream stream1 = stream
@@ -93,13 +93,13 @@ public class AssessmentTopology2 {
                 // TODO: 中间结果持久化到HBase
                 //算Count
                 stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
+                        .persistentAggregate(HBaseMapState.transactional(countOptions), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
                         .newValuesStream(),
                 new Fields(Field.ASSESSMENTID, Field.SESSIONID),
 
                 //算Sum
                 stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
+                        .persistentAggregate(HBaseMapState.transactional(sumOptions), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
                         .newValuesStream(),
                 new Fields(Field.ASSESSMENTID, Field.SESSIONID),
 
@@ -126,7 +126,6 @@ public class AssessmentTopology2 {
 
         logger.info("===============提交topology =============");
 
-        LocalCluster cluster = new LocalCluster();
         Config config = new Config();
         Config conf = new Config();
         conf.setDebug(true);
@@ -141,7 +140,16 @@ public class AssessmentTopology2 {
         conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
         conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
         conf.put("kafka.broker.properties", props);
-        cluster.submitTopology("TridentTopology", config, topology.build());
+
+
+
+        if(null != args && args.length > 0) {
+            StormSubmitter.submitTopology("TridentTopology", config, topology.build());
+        } else {
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology("TridentTopology",config,topology.build());
+        }
+
 
 
 //        try {
