@@ -22,8 +22,10 @@ import org.apache.storm.trident.Stream;
 import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.builtin.Count;
+import org.apache.storm.trident.operation.builtin.Debug;
 import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.trident.testing.MemoryMapState;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +59,12 @@ public class AssessmentTopology2 {
                 .withMapper(mapper);
         StateFactory factory = new MongoStateFactory(options);
 
+
+        MongoMapper mapper2 = new SimpleMongoMapper().withFields(Field.SESSIONUSERTRACKINGID, Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID);
         MongoState.Options options2 = new MongoState.Options()
                 .withUrl(url)
                 .withCollectionName(collection2)
-                .withMapper(mapper);
+                .withMapper(mapper2);
         StateFactory factory2 = new MongoStateFactory(options2);
 
 
@@ -79,7 +83,7 @@ public class AssessmentTopology2 {
 //        StateFactory redisStateFactory = HBaseMapState.transactional();
 
         //HBase存储学生明细
-
+//        HBaseMapState.transactional(sumHbaseOptions)
 
         //0. 声明拓扑
         TridentTopology topology = new TridentTopology();
@@ -94,32 +98,49 @@ public class AssessmentTopology2 {
                 .each(new Fields("str"), new PreProcessLauch2Tracking(), new Fields(Field.SESSIONUSERTRACKINGID, Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID));
 
 
+        Stream stream2 = stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
+                .chainedAgg()
+                .partitionAggregate(new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
+                .partitionAggregate(new Count(), new Fields(Field.COUNT))
+                .chainEnd()
+//                .persistentAggregate().newValuesStream()
+//                .persistentAggregate().newValuesStream()
+                //尝试最后做这一步
+                .partitionPersist(
+                        factory,
+                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT),
+                        new MongoStateUpdater(),
+                        new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT))
+                .newValuesStream()
+                .each(new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT), new Debug(true));
+
+
         //1.2 分流计算Sum和Count , 最后join到一起.  并持久化到mongo中.
-        logger.info("===============定义 分流到两个stream =============");
-        TridentState tridentState = topology.join(
-                //TODO: 中间结果持久化到HBase
-                stream1
-                        .each(new Fields(Field.SESSIONUSERTRACKINGID, Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID),
-                        new CustomPersistFunction(),
-                        new Fields())
-                        .groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(HBaseMapState.transactional(sumHbaseOptions), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
-                        .newValuesStream(),
-                new Fields(Field.ASSESSMENTID, Field.SESSIONID),
-                stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(HBaseMapState.transactional(countHbaseOptions), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
-                        .newValuesStream(),
-                new Fields(Field.ASSESSMENTID, Field.SESSIONID),
-                new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT)
-        ).partitionPersist(
-                factory,
-                new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT),
-                new MongoStateUpdater(),
-                new Fields()
-        );
+//        logger.info("===============定义 分流到两个stream =============");
+//        TridentState tridentState = topology.join(
+//                // TODO: 中间结果持久化到HBase
+//                //算Count
+//                stream2.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
+//                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
+//                        .newValuesStream(),
+//                new Fields(Field.ASSESSMENTID, Field.SESSIONID),
+//
+//                //算Sum
+//                stream2.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
+//                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
+//                        .newValuesStream(),
+//                new Fields(Field.ASSESSMENTID, Field.SESSIONID),
+//
+//                //聚合
+//                new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT)
+//
+//        ).partitionPersist(
+//                factory,
+//                new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT),
+//                new MongoStateUpdater(),
+//                new Fields()
+//        );
 
-
-        //1.1 存储学生明细
 
 
 //        //2. 查询计算结果
@@ -136,7 +157,7 @@ public class AssessmentTopology2 {
         LocalCluster cluster = new LocalCluster();
         Config config = new Config();
         Config conf = new Config();
-        conf.setDebug(false);
+        conf.setDebug(true);
         Properties props = new Properties();
         props.put("producer.type", "async");
         props.put("linger.ms", "1500");

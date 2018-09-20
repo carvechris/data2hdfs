@@ -16,9 +16,6 @@ public class PreProcessLauch2Tracking extends BaseFunction {
     private static Logger logger = LoggerFactory.getLogger(PreProcessLauch2Tracking.class);
     @Override
     public void execute(TridentTuple tuple, TridentCollector collector) {
-
-        logger.info("StartParsing data from json to fields");
-
         String json = tuple.getString(0);
         Document launch = null;
         try {
