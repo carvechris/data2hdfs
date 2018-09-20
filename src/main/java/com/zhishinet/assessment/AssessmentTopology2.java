@@ -1,7 +1,6 @@
 package com.zhishinet.assessment;
 
 
-import com.zhishinet.assessment.baseFunction.CustomPersistFunction;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -19,13 +18,11 @@ import org.apache.storm.mongodb.trident.state.MongoStateFactory;
 import org.apache.storm.mongodb.trident.state.MongoStateUpdater;
 import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.trident.Stream;
-import org.apache.storm.trident.TridentState;
 import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.builtin.Count;
 import org.apache.storm.trident.operation.builtin.Debug;
 import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.state.StateFactory;
-import org.apache.storm.trident.testing.MemoryMapState;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +109,7 @@ public class AssessmentTopology2 {
                         new MongoStateUpdater(),
                         new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT))
                 .newValuesStream()
-                .each(new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT), new Debug(true));
+                .each(new Fields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT), new Debug());
 
 
         //1.2 分流计算Sum和Count , 最后join到一起.  并持久化到mongo中.
