@@ -144,7 +144,7 @@ public class HomeworkAssessmentUserInteractionTopology {
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
-            config.setNumWorkers(3);
+//            config.setNumWorkers(3);
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
