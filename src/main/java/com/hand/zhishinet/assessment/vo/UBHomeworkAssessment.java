@@ -1,7 +1,5 @@
 package com.hand.zhishinet.assessment.vo;
 
-import org.apache.storm.tuple.Fields;
-
 import java.util.Date;
 
 /**
@@ -24,7 +22,7 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
     private Integer assessmentQuestions;
     private Date beginDate;
     private Date endDate;
-    private Integer assessmentBuilderId;
+    private Long assessmentBuilderId;
     private Integer templateType;
     private Boolean isOptionRandom;
     private Integer assessmentClassification;
@@ -39,6 +37,24 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
     private Integer displayOrder;
     private Integer textbookSeriesId;
     private Integer textbookId;
+
+    public Integer getTextbookSeriesId() {
+        return textbookSeriesId;
+    }
+
+    public void setTextbookSeriesId(Integer textbookSeriesId) {
+        this.textbookSeriesId = textbookSeriesId;
+    }
+
+    public Integer getTextbookId() {
+        return textbookId;
+    }
+
+    public void setTextbookId(Integer textbookId) {
+        this.textbookId = textbookId;
+    }
+
+
 
     public Long getHomeworkAssessmentId() {
         return homeworkAssessmentId;
@@ -104,11 +120,11 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
         this.endDate = endDate;
     }
 
-    public Integer getAssessmentBuilderId() {
+    public Long getAssessmentBuilderId() {
         return assessmentBuilderId;
     }
 
-    public void setAssessmentBuilderId(Integer assessmentBuilderId) {
+    public void setAssessmentBuilderId(Long assessmentBuilderId) {
         this.assessmentBuilderId = assessmentBuilderId;
     }
 
@@ -222,22 +238,6 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
 
     public void setIntroText(String introText) {
         this.introText = introText;
-    }
-
-    public Integer getTextbookSeriesId() {
-        return textbookSeriesId;
-    }
-
-    public void setTextbookSeriesId(Integer textbookSeriesId) {
-        this.textbookSeriesId = textbookSeriesId;
-    }
-
-    public Integer getTextbookId() {
-        return textbookId;
-    }
-
-    public void setTextbookId(Integer textbookId) {
-        this.textbookId = textbookId;
     }
 
 }

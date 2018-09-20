@@ -1,10 +1,8 @@
 package com.hand.zhishinet.assessment.bolt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
-import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
 import com.hand.zhishinet.assessment.vo.UBHomeworkAssessmentSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
@@ -34,6 +32,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -42,8 +41,6 @@ public class UBHomeworkAssessmentSessionTopology {
     public static final String TOPIC = "UBHomeworkAssessmentSession";
     public static final String SPOUTID = "ubhomeworkassessmentsessionstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkAssessmentSessionTopology";
-
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
 
@@ -58,7 +55,14 @@ public class UBHomeworkAssessmentSessionTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBHomeworkAssessmentSession assessmentSession = gson.fromJson(json, UBHomeworkAssessmentSession.class);
+            ObjectMapper mapper = new ObjectMapper();
+            UBHomeworkAssessmentSession assessmentSession = null;
+            try {
+                assessmentSession = mapper.readValue(json, UBHomeworkAssessmentSession.class);
+            } catch (IOException e) {
+                logger.error("The message from kafka, the data is {}", e.getMessage());
+                logger.error("The message from kafka transfer to UBHomeworkAssessmentSession error: {}", e.getMessage());
+            }
             if (Objects.isNull(assessmentSession)) {
                 this.outputCollector.fail(tuple);
             } else {
@@ -135,7 +139,7 @@ public class UBHomeworkAssessmentSessionTopology {
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 
         if(null != args && args.length > 0) {
-            config.setNumWorkers(3);
+            //config.setNumWorkers(3);
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();

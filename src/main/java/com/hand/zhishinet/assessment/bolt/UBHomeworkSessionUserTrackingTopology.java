@@ -1,7 +1,6 @@
 package com.hand.zhishinet.assessment.bolt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
 import org.apache.storm.Config;
@@ -32,17 +31,17 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class UBHomeworkSessionUserTrackingTopology {
-    public static final String topic = "UBHomeworkSessionUserTracking";
-    public static final String spoutId = "ubhomeworksessionusertrackingstorm";
+    public static final String TOPIC = "UBHomeworkSessionUserTracking";
+    public static final String SPOUTID = "ubhomeworksessionusertrackingstorm";
+    public static final String TOPOLOGY_NAME = "UBHomeworkSessionUserTrackingTopology";
 
     public static class UBHomeworkSessionUserTrackingBolt extends BaseRichBolt {
         private OutputCollector collector;
         private final static Logger logger = LoggerFactory.getLogger(UBHomeworkSessionUserTrackingBolt.class);
-        private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
 
         @Override
         public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
@@ -52,7 +51,14 @@ public class UBHomeworkSessionUserTrackingTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBHomeworkSessionUserTracking log = gson.fromJson(json,UBHomeworkSessionUserTracking.class);
+            ObjectMapper mapper = new ObjectMapper();
+            UBHomeworkSessionUserTracking log = null;
+            try {
+                log = mapper.readValue(json, UBHomeworkSessionUserTracking.class);
+            } catch (IOException e) {
+                logger.error("The message from kafka, the data is {}", e.getMessage());
+                logger.error("The message from kafka transfer to UBHomeworkAssessment error: {}", e.getMessage());
+            }
             this.collector.ack(tuple);
             this.collector.emit(new Values(log.getHomeworkSessionUserTrackingId(),log.getSessionId(),log.getHomeworkAssessmentId(),
                     log.getUserId(),log.getNoOfVisits(),log.getLastViewedOn(),log.getStatusId(),log.getCompletedOn(),log.getScore(),
@@ -75,30 +81,28 @@ public class UBHomeworkSessionUserTrackingTopology {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 
-        SpoutConfig spoutConfig = (SpoutConfig) MyConfig.getKafkaSpoutConfig(topic, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,spoutId);
+        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
+
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(100.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/").withExtension(".txt");
-        HdfsBolt bolt = new HdfsBolt()
-                .withFsUrl(MyConfig.HDFS_URL)
-                .withFileNameFormat(fileNameFormat)
-                .withRecordFormat(format)
-                .withRotationPolicy(rotationPolicy)
-                .withSyncPolicy(syncPolicy);
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkSessionUserTracking/").withExtension(".txt");
+        HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
+                .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("MyConfig",new KafkaSpout(spoutConfig),10);
-        builder.setBolt("UBHomeworkSessionUserTrackingBolt",new UBHomeworkSessionUserTrackingBolt()).shuffleGrouping("MyConfig");
-        builder.setBolt("HdfsBolt",bolt).shuffleGrouping("UBHomeworkSessionUserTrackingBolt");
+        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
+        builder.setBolt("splitDataBolt",new UBHomeworkAssessmentTopology.SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("splitDataBolt");
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 
         if(null != args && args.length > 0) {
-            StormSubmitter.submitTopology("UBHomeworkSessionUserTrackingTopology", config, builder.createTopology());
+            //config.setNumWorkers(3);
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("UBHomeworkSessionUserTrackingTopology",config,builder.createTopology());
+            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
         }
     }
 }

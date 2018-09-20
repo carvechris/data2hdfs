@@ -1,7 +1,6 @@
 package com.hand.zhishinet.assessment.bolt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
 import com.hand.zhishinet.MyConfig;
@@ -33,6 +32,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,8 +41,6 @@ public class UBHomeworkAssessmentTopology {
     public static final String TOPIC = "UBHomeworkAssessment";
     public static final String SPOUTID = "ubhomeworkassessmentstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkAssessmentTopology";
-
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class SplitDataBolt extends BaseRichBolt {
 
@@ -57,7 +55,14 @@ public class UBHomeworkAssessmentTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBHomeworkAssessment assessment = gson.fromJson(json, UBHomeworkAssessment.class);
+            ObjectMapper mapper = new ObjectMapper();
+            UBHomeworkAssessment assessment = null;
+            try {
+                assessment = mapper.readValue(json, UBHomeworkAssessment.class);
+            } catch (IOException e) {
+                logger.error("The message from kafka, the data is {}", e.getMessage());
+                logger.error("The message from kafka transfer to UBHomeworkAssessment error: {}", e.getMessage());
+            }
             if (Objects.isNull(assessment)) {
                 this.outputCollector.fail(tuple);
             } else {
@@ -98,19 +103,20 @@ public class UBHomeworkAssessmentTopology {
                 }
                 values.add(assessment.getTimerMode());
 
-                if(null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() <= 0) {
+                if(null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() < 0) {
                     logger.error("The message from kafka assessmentQuestions is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
                     throw new IllegalArgumentException("The message from kafka assessmentQuestions is inValidate ");
                 }
                 values.add(assessment.getAssessmentQuestions());
 
-                if(null == assessment.getDeleted()) {
+                /*if(null == assessment.getDeleted()) {
                     logger.error("The message from kafka isDeleted is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
                     throw new IllegalArgumentException("The message from kafka isDeleted is inValidate ");
                 }
-                values.add(assessment.getDeleted());
+                values.add(assessment.getDeleted());*/
+                values.add(!Objects.isNull(assessment.getDeleted()) ? assessment.getDeleted() : "\\N");
 
                 if(null == assessment.getTemplateType() || assessment.getTemplateType() <= 0) {
                     logger.error("The message from kafka templateType is inValidate : {}", json);
@@ -187,7 +193,7 @@ public class UBHomeworkAssessmentTopology {
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 
         if(null != args && args.length > 0) {
-            config.setNumWorkers(3);
+            //config.setNumWorkers(3);
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
