@@ -77,7 +77,7 @@ public class UBHomeworkSessionUserTrackingTopology {
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(100.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/homeworksessionusertracking/storm/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/").withExtension(".txt");
         HdfsBolt bolt = new HdfsBolt()
                 .withFsUrl(MyConfig.HDFS_URL)
                 .withFileNameFormat(fileNameFormat)
