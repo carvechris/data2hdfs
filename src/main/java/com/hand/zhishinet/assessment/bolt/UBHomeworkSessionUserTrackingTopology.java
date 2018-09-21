@@ -1,6 +1,7 @@
 package com.hand.zhishinet.assessment.bolt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
@@ -31,7 +32,6 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,6 +39,7 @@ public class UBHomeworkSessionUserTrackingTopology {
     public static final String TOPIC = "UBHomeworkSessionUserTracking";
     public static final String SPOUTID = "ubhomeworksessionusertrackingstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkSessionUserTrackingTopology";
+    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class UBHomeworkSessionUserTrackingBolt extends BaseRichBolt {
         private OutputCollector collector;
@@ -52,14 +53,7 @@ public class UBHomeworkSessionUserTrackingTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            ObjectMapper mapper = new ObjectMapper();
-            UBHomeworkSessionUserTracking log = null;
-            try {
-                log = mapper.readValue(json, UBHomeworkSessionUserTracking.class);
-            } catch (IOException e) {
-                logger.error("The message from kafka, the data is {}", e.getMessage());
-                logger.error("The message from kafka transfer to UBHomeworkSessionUserTracking error: {}", e.getMessage());
-            }
+            UBHomeworkSessionUserTracking log = gson.fromJson(json, UBHomeworkSessionUserTracking.class);
             if (Objects.isNull(log)) {
                 this.collector.fail(tuple);
             } else {
