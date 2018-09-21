@@ -147,7 +147,7 @@ public class UBHomeworkAssessmentTopology {
                 values.add(!Objects.isNull(assessment.getAllowBack()) ? assessment.getAllowBack() : "\\N");
                 values.add(!Objects.isNull(assessment.getAllowSkip()) ? assessment.getAllowSkip() : "\\N");
                 values.add(!Objects.isNull(assessment.getDisableFeedback()) ? assessment.getDisableFeedback() : "\\N");
-                values.add(!Objects.isNull(assessment.getAssessmentBuilderType()) ? assessment.getAssessmentBuilderType() : "\\N");
+                values.add(!Objects.isNull(assessment.getAssessmentBuilderId()) ? assessment.getAssessmentBuilderId() : "\\N");
                 values.add(!Objects.isNull(assessment.getSubjectId()) ? assessment.getSubjectId() : "\\N");
                 values.add(!Objects.isNull(assessment.getOral()) ? assessment.getOral() : "\\N");
                 values.add(!Objects.isNull(assessment.getShowSubTitle()) ? assessment.getShowSubTitle() : "\\N");
