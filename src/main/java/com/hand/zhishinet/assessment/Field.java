@@ -13,11 +13,11 @@ public class Field {
     public static Fields getHomeworkAssessmentFields(){
         return new Fields("homeworkAssessmentId","assessmentTitle","tenantId",
                 "isTimerOn","timerMode","assessmentQuestions",
-                "isDeleted","templateType","assessmentBuilderId",
+                "isDeleted","templateType","assessmentBuilderType",
                 "isOptionRandom","minimumPassPercentage","beginDate",
                 "endDate","assessmentClassification","duration",
                 "allowBack","allowSkip","disableFeedback",
-                "assessmentBuilderType","subjectId","isOral",
+                "assessmentBuilderId","subjectId","isOral",
                 "showSubTitle","displayOrder","textbookId",
                 "textbookSeriesId","assessmentIntroText","createdBy",
                 "createdOn","modifiedBy","modifiedOn",
