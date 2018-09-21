@@ -1,5 +1,6 @@
 package com.zhishinet.hdfs;
 
+import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.StormTopology;
@@ -83,7 +84,7 @@ public class HDFSTopology  {
         // rotate files when they reach 1MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
 
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/tomaer/");
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/hdfs/");
 
         HdfsBolt bolt = new HdfsBolt()
                 .withFsUrl("hdfs://macos:8020")
