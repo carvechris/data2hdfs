@@ -57,7 +57,7 @@ public class UBHomeworkSessionUserTrackingTopology {
                 log = mapper.readValue(json, UBHomeworkSessionUserTracking.class);
             } catch (IOException e) {
                 logger.error("The message from kafka, the data is {}", e.getMessage());
-                logger.error("The message from kafka transfer to UBHomeworkAssessment error: {}", e.getMessage());
+                logger.error("The message from kafka transfer to UBHomeworkSessionUserTracking error: {}", e.getMessage());
             }
             this.collector.ack(tuple);
             this.collector.emit(new Values(log.getHomeworkSessionUserTrackingId(),log.getSessionId(),log.getHomeworkAssessmentId(),
