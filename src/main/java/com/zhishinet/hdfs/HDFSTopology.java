@@ -1,8 +1,13 @@
 package com.zhishinet.hdfs;
 
+import com.hand.zhishinet.MyConfig;
 import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
 import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
@@ -29,6 +34,7 @@ import java.util.Map;
 
 public class HDFSTopology  {
 
+    public static final String TOPOLOGY_NAME = "HDFSTopology";
     public static class MySpout extends BaseRichSpout {
 
         private SpoutOutputCollector spoutOutputCollector;
@@ -74,7 +80,7 @@ public class HDFSTopology  {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         // use "|" instead of "," for field delimiter
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
 
@@ -87,7 +93,7 @@ public class HDFSTopology  {
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/hdfs/");
 
         HdfsBolt bolt = new HdfsBolt()
-                .withFsUrl("hdfs://macos:8020")
+                .withFsUrl(MyConfig.HDFS_URL)
                 .withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format)
                 .withRotationPolicy(rotationPolicy)
@@ -98,8 +104,12 @@ public class HDFSTopology  {
         builder.setBolt("MyBolt",new MyBolt()).shuffleGrouping("MySpout");
         builder.setBolt("HdfsBolt",bolt).shuffleGrouping("MyBolt");
         StormTopology topology = builder.createTopology();
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("HDFSTopology",new Config(),topology);
-        //cluster.shutdown();
+
+        if(null != args && args.length > 0) {
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, new Config(), builder.createTopology());
+        } else {
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology(TOPOLOGY_NAME,new Config(),builder.createTopology());
+        }
     }
 }
