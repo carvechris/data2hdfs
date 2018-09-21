@@ -2,6 +2,7 @@ package com.hand.zhishinet.assessment.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
+import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -25,7 +26,6 @@ import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 public class UBHomeworkSessionUserTrackingTopology {
     public static final String TOPIC = "UBHomeworkSessionUserTracking";
@@ -59,23 +60,75 @@ public class UBHomeworkSessionUserTrackingTopology {
                 logger.error("The message from kafka, the data is {}", e.getMessage());
                 logger.error("The message from kafka transfer to UBHomeworkSessionUserTracking error: {}", e.getMessage());
             }
-            this.collector.ack(tuple);
-            this.collector.emit(new Values(log.getHomeworkSessionUserTrackingId(),log.getSessionId(),log.getHomeworkAssessmentId(),
-                    log.getUserId(),log.getNoOfVisits(),log.getLastViewedOn(),log.getStatusId(),log.getCompletedOn(),log.getScore(),
-                    log.getPercentScore(),log.getCompleteAttempts(),log.getBeginDate(),log.getEndDate(),log.getTimeSpent(),
-                    log.getInteractionTimer(),log.getArticleLocation(),log.getLocation(),log.getChecked(),log.getForLearnerStatus(),log.getQuestionIndexs(),
-                    log.getEmendStatus(),log.getRequiredEmend(),log.getSubjectId(),log.getReadCount(),log.getShowSubTitle(),log.getEmendTypeCode(),
-                    log.getSessionGroupId(),log.getDisplayOrder(),log.getCreatedOn(),log.getCreatedBy(),log.getModifiedOn(),log.getModifiedBy(),log.getDeletedOn(),
-                    log.getDeletedBy(),log.getDeleted()));
+            if (Objects.isNull(log)) {
+                this.collector.fail(tuple);
+            } else {
+                Values values = new Values();
+                if (log.getHomeworkSessionUserTrackingId() == null) {
+                    logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
+                    this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate ");
+                }
+                values.add(log.getHomeworkSessionUserTrackingId());
+                if (log.getSessionId() == null) {
+                    logger.error("The message from kafka sessionId is inValidate : {}", json);
+                    this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");
+                }
+                values.add(log.getSessionId());
+                if (log.getHomeworkAssessmentId() == null) {
+                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
+                    this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
+                }
+                values.add(log.getHomeworkAssessmentId());
+                if (log.getUserId() == null) {
+                    logger.error("The message from kafka userId is inValidate : {}", json);
+                    this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka userId is inValidate ");
+                }
+                values.add(log.getUserId());
+                this.collector.ack(tuple);
+                values.add(!Objects.isNull(log.getNoOfVisits()) ? log.getNoOfVisits() : "\\N");
+                values.add(!Objects.isNull(log.getLastViewedOn()) ? log.getLastViewedOn() : "\\N");
+                values.add(!Objects.isNull(log.getStatusId()) ? log.getStatusId() : "\\N");
+                values.add(!Objects.isNull(log.getCompletedOn()) ? log.getCompletedOn() : "\\N");
+                values.add(!Objects.isNull(log.getScore()) ? log.getScore() : "\\N");
+                values.add(!Objects.isNull(log.getPercentScore()) ? log.getPercentScore() : "\\N");
+                values.add(!Objects.isNull(log.getCompleteAttempts()) ? log.getCompleteAttempts() : "\\N");
+                values.add(!Objects.isNull(log.getBeginDate()) ? log.getBeginDate() : "\\N");
+                values.add(!Objects.isNull(log.getEndDate()) ? log.getEndDate() : "\\N");
+                values.add(!Objects.isNull(log.getTimeSpent()) ? log.getTimeSpent() : "\\N");
+                values.add(!Objects.isNull(log.getInteractionTimer()) ? log.getInteractionTimer() : "\\N");
+                values.add(!Objects.isNull(log.getArticleLocation()) ? log.getArticleLocation() : "\\N");
+                values.add(!Objects.isNull(log.getLocation()) ? log.getLocation() : "\\N");
+                values.add(!Objects.isNull(log.getChecked()) ? log.getChecked() : "\\N");
+                values.add(!Objects.isNull(log.getForLearnerStatus()) ? log.getForLearnerStatus() : "\\N");
+                values.add(!Objects.isNull(log.getQuestionIndexs()) ? log.getQuestionIndexs() : "\\N");
+                values.add(!Objects.isNull(log.getEmendStatus()) ? log.getEmendStatus() : "\\N");
+                values.add(!Objects.isNull(log.getRequiredEmend()) ? log.getRequiredEmend() : "\\N");
+                values.add(!Objects.isNull(log.getSubjectId()) ? log.getSubjectId() : "\\N");
+                values.add(!Objects.isNull(log.getReadCount()) ? log.getReadCount() : "\\N");
+                values.add(!Objects.isNull(log.getShowSubTitle()) ? log.getShowSubTitle() : "\\N");
+                values.add(!Objects.isNull(log.getEmendTypeCode()) ? log.getEmendTypeCode() : "\\N");
+                values.add(!Objects.isNull(log.getSessionGroupId()) ? log.getSessionGroupId() : "\\N");
+                values.add(!Objects.isNull(log.getDisplayOrder()) ? log.getDisplayOrder() : "\\N");
+                values.add(!Objects.isNull(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(log.getCreatedBy()) ? log.getCreatedBy() : "\\N");
+                values.add(!Objects.isNull(log.getModifiedOn()) ? log.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(log.getModifiedBy()) ? log.getModifiedBy() : "\\N");
+                values.add(!Objects.isNull(log.getDeletedOn()) ? log.getDeletedOn() : "\\N");
+                values.add(!Objects.isNull(log.getDeletedBy()) ? log.getDeletedBy() : "\\N");
+                values.add(!Objects.isNull(log.getDeleted()) ? log.getDeleted() : "\\N");
+                this.collector.ack(tuple);
+                this.collector.emit(values);
+            }
+
         }
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(new Fields("homeworkSessionUserTrackingId","sessionId","homeworkAssessmentId","userId","noOfVisits",
-                    "lastViewedOn","statusId","completedOn","score","percentScore","completeAttempts","beginDate","endDate","timeSpent",
-                    "interactionTimer","articleLocation","location","isChecked","forLearnerStatus","questionIndexs","emendStatus","IsRequiredEmend",
-                    "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
-                    "modifiedBy","deletedOn","deletedBy","deleted"));
+            outputFieldsDeclarer.declare(Field.getHomeworkSessionUserTrackingFields());
         }
     }
 
