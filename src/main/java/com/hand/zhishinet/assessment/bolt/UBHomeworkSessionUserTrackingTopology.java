@@ -1,7 +1,6 @@
 package com.hand.zhishinet.assessment.bolt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
@@ -32,6 +31,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +39,6 @@ public class UBHomeworkSessionUserTrackingTopology {
     public static final String TOPIC = "UBHomeworkSessionUserTracking";
     public static final String SPOUTID = "ubhomeworksessionusertrackingstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkSessionUserTrackingTopology";
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     public static class UBHomeworkSessionUserTrackingBolt extends BaseRichBolt {
         private OutputCollector collector;
@@ -53,36 +52,43 @@ public class UBHomeworkSessionUserTrackingTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
-            UBHomeworkSessionUserTracking log = gson.fromJson(json, UBHomeworkSessionUserTracking.class);
+            ObjectMapper mapper = new ObjectMapper();
+            UBHomeworkSessionUserTracking log = null;
+            try {
+                log = mapper.readValue(json,UBHomeworkSessionUserTracking.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("The message from kafka, the data is {}", e.getMessage());
+                logger.error("The message from kafka transfer to UBHomeworkSessionUserTracking error: {}", e.getMessage());
+            }
             if (Objects.isNull(log)) {
                 this.collector.fail(tuple);
             } else {
                 Values values = new Values();
                 if (log.getHomeworkSessionUserTrackingId() == null) {
                     logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
-                    this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate ");
+                   /* this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate ");*/
                 }
                 values.add(log.getHomeworkSessionUserTrackingId());
                 if (log.getSessionId() == null) {
                     logger.error("The message from kafka sessionId is inValidate : {}", json);
-                    this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");
+                    /*this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");*/
                 }
                 values.add(log.getSessionId());
                 if (log.getHomeworkAssessmentId() == null) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
+                    /*this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
                 }
                 values.add(log.getHomeworkAssessmentId());
                 if (log.getUserId() == null) {
                     logger.error("The message from kafka userId is inValidate : {}", json);
-                    this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka userId is inValidate ");
+                    /*this.collector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka userId is inValidate ");*/
                 }
                 values.add(log.getUserId());
-                this.collector.ack(tuple);
                 values.add(!Objects.isNull(log.getNoOfVisits()) ? log.getNoOfVisits() : "\\N");
                 values.add(!Objects.isNull(log.getLastViewedOn()) ? log.getLastViewedOn() : "\\N");
                 values.add(!Objects.isNull(log.getStatusId()) ? log.getStatusId() : "\\N");
