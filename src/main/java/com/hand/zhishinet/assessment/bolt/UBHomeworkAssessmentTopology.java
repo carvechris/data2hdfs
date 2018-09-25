@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
+import com.zhishinet.Utils;
+import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -12,7 +14,6 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
-import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -68,45 +69,39 @@ public class UBHomeworkAssessmentTopology {
             } else {
                 //1.验证必需字段
                 Values values = new Values();
-                if(null == assessment.getHomeworkAssessmentId() || assessment.getHomeworkAssessmentId() <= 0) {
+                if (null == assessment.getHomeworkAssessmentId() || assessment.getHomeworkAssessmentId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getHomeworkAssessmentId());
 
-                if(StringUtils.isBlank(assessment.getTitle())) {
+                if (StringUtils.isBlank(assessment.getTitle())) {
                     logger.error("The message from kafka title is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka title is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getTitle());
 
-                if(null == assessment.getTenantId() || assessment.getTenantId() <= 0) {
+                if (null == assessment.getTenantId() || assessment.getTenantId() <= 0) {
                     logger.error("The message from kafka tenantId is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka tenantId is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getTenantId());
 
-                if(null == assessment.getTimerOn()) {
+                if (null == assessment.getTimerOn()) {
                     logger.error("The message from kafka isTimerOn is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka isTimerOn is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getTimerOn());
 
-                if(null == assessment.getTimerMode() || assessment.getTimerMode() <= 0) {
+                if (null == assessment.getTimerMode() || assessment.getTimerMode() <= 0) {
                     logger.error("The message from kafka timerMode is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka timerMode is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getTimerMode());
 
-                if(null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() < 0) {
+                if (null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() < 0) {
                     logger.error("The message from kafka assessmentQuestions is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentQuestions is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getAssessmentQuestions());
 
@@ -118,30 +113,27 @@ public class UBHomeworkAssessmentTopology {
                 values.add(assessment.getDeleted());*/
                 values.add(!Objects.isNull(assessment.getDeleted()) ? assessment.getDeleted() : "\\N");
 
-                if(null == assessment.getTemplateType() || assessment.getTemplateType() <= 0) {
+                if (null == assessment.getTemplateType() || assessment.getTemplateType() <= 0) {
                     logger.error("The message from kafka templateType is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka templateType is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getTemplateType());
 
-                if(null == assessment.getAssessmentBuilderType() || assessment.getAssessmentBuilderType() <= 0) {
+                if (null == assessment.getAssessmentBuilderType() || assessment.getAssessmentBuilderType() <= 0) {
                     logger.error("The message from kafka assessmentBuilderType is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentBuilderType is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getAssessmentBuilderType());
 
-                if(null == assessment.getOptionRandom()) {
+                if (null == assessment.getOptionRandom()) {
                     logger.error("The message from kafka isOptionRandom is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka isOptionRandom is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessment.getOptionRandom());
 
                 values.add(!Objects.isNull(assessment.getMinimumPassPercentage()) ? assessment.getMinimumPassPercentage() : "\\N");
-                values.add(!Objects.isNull(assessment.getBeginDate()) ? assessment.getBeginDate() : "\\N");
-                values.add(!Objects.isNull(assessment.getEndDate()) ? assessment.getEndDate() : "\\N");
+                values.add(!Objects.isNull(assessment.getBeginDate()) ? Utils.formatDate2String(assessment.getBeginDate()) : "\\N");
+                values.add(!Objects.isNull(assessment.getEndDate()) ? Utils.formatDate2String(assessment.getEndDate()) : "\\N");
                 values.add(!Objects.isNull(assessment.getAssessmentClassification()) ? assessment.getAssessmentClassification() : "\\N");
                 values.add(!Objects.isNull(assessment.getDuration()) ? assessment.getDuration() : "\\N");
                 values.add(!Objects.isNull(assessment.getAllowBack()) ? assessment.getAllowBack() : "\\N");
@@ -155,13 +147,12 @@ public class UBHomeworkAssessmentTopology {
                 values.add(!Objects.isNull(assessment.getTextbookId()) ? assessment.getTextbookId() : "\\N");
                 values.add(!Objects.isNull(assessment.getTextbookSeriesId()) ? assessment.getTextbookSeriesId() : "\\N");
                 values.add(StringUtils.isNotBlank(assessment.getIntroText()) ? assessment.getIntroText() : "\\N");
-
                 values.add(!Objects.isNull(assessment.getCreatedBy()) ? assessment.getCreatedBy() : "\\N");
-                values.add(!Objects.isNull(assessment.getCreatedOn()) ? assessment.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(assessment.getCreatedOn()) ? Utils.formatDate2String(assessment.getCreatedOn()) : "\\N");
                 values.add(!Objects.isNull(assessment.getModifiedBy()) ? assessment.getModifiedBy() : "\\N");
-                values.add(!Objects.isNull(assessment.getModifiedOn()) ? assessment.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(assessment.getModifiedOn()) ? Utils.formatDate2String(assessment.getModifiedOn()) : "\\N");
                 values.add(!Objects.isNull(assessment.getDeletedBy()) ? assessment.getDeletedBy() : "\\N");
-                values.add(!Objects.isNull(assessment.getDeletedOn()) ? assessment.getDeletedOn() : "\\N");
+                values.add(!Objects.isNull(assessment.getDeletedOn()) ? Utils.formatDate2String(assessment.getDeletedOn()) : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
@@ -176,28 +167,29 @@ public class UBHomeworkAssessmentTopology {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
+        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS, MyConfig.ZK_ROOT, SPOUTID);
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessment/").withExtension(".txt");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
+        //  FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessment/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkAssessment/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
-        builder.setBolt("splitDataBolt",new SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("splitDataBolt");
+        builder.setSpout("kafkaSpout", new KafkaSpout(spoutConfig), 3);
+        builder.setBolt("splitDataBolt", new SplitDataBolt(), 3).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt", hdfsBolt, 3).shuffleGrouping("splitDataBolt");
 
-        Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
+        Config config = MyConfig.getConfigWithKafkaConsumerProps(false, MyConfig.KAFKA_BROKERS);
 
-        if(null != args && args.length > 0) {
+        if (null != args && args.length > 0) {
             //config.setNumWorkers(3);
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
+            cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         }
     }
 

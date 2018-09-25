@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
+import com.zhishinet.Utils;
+import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
@@ -11,7 +13,6 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
-import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -67,37 +68,34 @@ public class UBHomeworkSessionUserTrackingTopology {
                 Values values = new Values();
                 if (log.getHomeworkSessionUserTrackingId() == null) {
                     logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
-                   /* this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate ");*/
+                    this.collector.fail(tuple);
                 }
                 values.add(log.getHomeworkSessionUserTrackingId());
                 if (log.getSessionId() == null) {
                     logger.error("The message from kafka sessionId is inValidate : {}", json);
-                    /*this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");*/
+                    this.collector.fail(tuple);
                 }
                 values.add(log.getSessionId());
                 if (log.getHomeworkAssessmentId() == null) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    /*this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
+                    this.collector.fail(tuple);
                 }
                 values.add(log.getHomeworkAssessmentId());
                 if (log.getUserId() == null) {
                     logger.error("The message from kafka userId is inValidate : {}", json);
-                    /*this.collector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka userId is inValidate ");*/
+                    this.collector.fail(tuple);
+
                 }
                 values.add(log.getUserId());
                 values.add(!Objects.isNull(log.getNoOfVisits()) ? log.getNoOfVisits() : "\\N");
-                values.add(!Objects.isNull(log.getLastViewedOn()) ? log.getLastViewedOn() : "\\N");
+                values.add(!Objects.isNull(log.getLastViewedOn()) ? Utils.formatDate2String(log.getLastViewedOn()) : "\\N");
                 values.add(!Objects.isNull(log.getStatusId()) ? log.getStatusId() : "\\N");
-                values.add(!Objects.isNull(log.getCompletedOn()) ? log.getCompletedOn() : "\\N");
+                values.add(!Objects.isNull(log.getCompletedOn()) ? Utils.formatDate2String(log.getCompletedOn()) : "\\N");
                 values.add(!Objects.isNull(log.getScore()) ? log.getScore() : "\\N");
                 values.add(!Objects.isNull(log.getPercentScore()) ? log.getPercentScore() : "\\N");
                 values.add(!Objects.isNull(log.getCompleteAttempts()) ? log.getCompleteAttempts() : "\\N");
-                values.add(!Objects.isNull(log.getBeginDate()) ? log.getBeginDate() : "\\N");
-                values.add(!Objects.isNull(log.getEndDate()) ? log.getEndDate() : "\\N");
+                values.add(!Objects.isNull(log.getBeginDate()) ? Utils.formatDate2String(log.getBeginDate()) : "\\N");
+                values.add(!Objects.isNull(log.getEndDate()) ? Utils.formatDate2String(log.getEndDate()) : "\\N");
                 values.add(!Objects.isNull(log.getTimeSpent()) ? log.getTimeSpent() : "\\N");
                 values.add(!Objects.isNull(log.getInteractionTimer()) ? log.getInteractionTimer() : "\\N");
                 values.add(!Objects.isNull(log.getArticleLocation()) ? log.getArticleLocation() : "\\N");
@@ -113,11 +111,11 @@ public class UBHomeworkSessionUserTrackingTopology {
                 values.add(!Objects.isNull(log.getEmendTypeCode()) ? log.getEmendTypeCode() : "\\N");
                 values.add(!Objects.isNull(log.getSessionGroupId()) ? log.getSessionGroupId() : "\\N");
                 values.add(!Objects.isNull(log.getDisplayOrder()) ? log.getDisplayOrder() : "\\N");
-                values.add(!Objects.isNull(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(log.getCreatedOn()) ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
                 values.add(!Objects.isNull(log.getCreatedBy()) ? log.getCreatedBy() : "\\N");
-                values.add(!Objects.isNull(log.getModifiedOn()) ? log.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(log.getModifiedOn()) ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
                 values.add(!Objects.isNull(log.getModifiedBy()) ? log.getModifiedBy() : "\\N");
-                values.add(!Objects.isNull(log.getDeletedOn()) ? log.getDeletedOn() : "\\N");
+                values.add(!Objects.isNull(log.getDeletedOn()) ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
                 values.add(!Objects.isNull(log.getDeletedBy()) ? log.getDeletedBy() : "\\N");
                 values.add(!Objects.isNull(log.getDeleted()) ? log.getDeleted() : "\\N");
                 this.collector.ack(tuple);
@@ -138,8 +136,8 @@ public class UBHomeworkSessionUserTrackingTopology {
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkSessionUserTracking/").withExtension(".txt");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkSessionUserTracking/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 

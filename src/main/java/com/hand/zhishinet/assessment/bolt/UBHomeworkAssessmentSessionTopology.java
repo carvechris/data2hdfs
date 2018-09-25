@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkAssessmentSession;
+import com.zhishinet.Utils;
+import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -12,7 +14,6 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
-import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -70,29 +71,25 @@ public class UBHomeworkAssessmentSessionTopology {
                 Values values = new Values();
                 if(null == assessmentSession.getHomeworkAssessmentId() || assessmentSession.getHomeworkAssessmentId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                   /* this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessmentSession.getHomeworkAssessmentId());
 
                 if(null == assessmentSession.getAssessmentSessionId() || assessmentSession.getAssessmentSessionId() <= 0) {
                     logger.error("The message from kafka assessmentSessionId is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentSessionId is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessmentSession.getAssessmentSessionId());
 
                 if(null == assessmentSession.getSessionId() || assessmentSession.getSessionId() <= 0) {
                     logger.error("The message from kafka sessionId is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessmentSession.getSessionId());
 
                 if(StringUtils.isNotBlank(assessmentSession.getEmendTypeCode())) {
                     logger.error("The message from kafka emendTypeCode is inValidate : {}", json);
-                    /*this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka emendTypeCode is inValidate ");*/
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(assessmentSession.getEmendTypeCode());
 
@@ -103,11 +100,11 @@ public class UBHomeworkAssessmentSessionTopology {
                 values.add(!Objects.isNull(assessmentSession.getSessionGroupId()) ? assessmentSession.getSessionGroupId() : "\\N");
 
                 values.add(!Objects.isNull(assessmentSession.getCreatedBy()) ? assessmentSession.getCreatedBy() : "\\N");
-                values.add(!Objects.isNull(assessmentSession.getCreatedOn()) ? assessmentSession.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getCreatedOn()) ? Utils.formatDate2String(assessmentSession.getCreatedOn()) : "\\N");
                 values.add(!Objects.isNull(assessmentSession.getModifiedBy()) ? assessmentSession.getModifiedBy() : "\\N");
-                values.add(!Objects.isNull(assessmentSession.getModifiedOn()) ? assessmentSession.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getModifiedOn()) ? Utils.formatDate2String(assessmentSession.getModifiedOn()) : "\\N");
                 values.add(!Objects.isNull(assessmentSession.getDeletedBy()) ? assessmentSession.getDeletedBy() : "\\N");
-                values.add(!Objects.isNull(assessmentSession.getDeletedOn()) ? assessmentSession.getDeletedOn() : "\\N");
+                values.add(!Objects.isNull(assessmentSession.getDeletedOn()) ? Utils.formatDate2String(assessmentSession.getDeletedOn()) : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
@@ -126,8 +123,8 @@ public class UBHomeworkAssessmentSessionTopology {
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentSession/").withExtension(".txt");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkAssessmentSession/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
