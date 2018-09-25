@@ -1,10 +1,10 @@
 package com.zhishinet.sms.trident;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.zhishinet.sms.Field;
 import com.zhishinet.sms.UBUserSMSLog;
+import com.zhishinet.storm.ZhishinetTridentFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -15,7 +15,6 @@ import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.trident.HdfsState;
 import org.apache.storm.hdfs.trident.HdfsStateFactory;
 import org.apache.storm.hdfs.trident.HdfsUpdater;
-import org.apache.storm.hdfs.trident.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.trident.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.trident.format.FileNameFormat;
 import org.apache.storm.hdfs.trident.format.RecordFormat;
@@ -32,6 +31,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class SMSLogTopology {
@@ -39,14 +39,19 @@ public class SMSLogTopology {
     public static final String TOPIC = "UBUserSMSLog";
     public static final String SPOUTID = "ubusersmslogstorm";
     public static final String TOPOLOGY_NAME = "SMSLogTopology";
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    private final static ObjectMapper mapper = new ObjectMapper();
 
     public static class SplitData extends BaseFunction {
         private static final Logger logger = LoggerFactory.getLogger(SplitData.class);
         @Override
         public void execute(TridentTuple tuple, TridentCollector collector) {
             final String json = tuple.getString(0);
-            UBUserSMSLog log = gson.fromJson(json, UBUserSMSLog.class);
+            UBUserSMSLog log = null;
+            try {
+                log = mapper.readValue(json,UBUserSMSLog.class);
+            } catch (IOException e) {
+                logger.error("",e);
+            }
             if (Objects.isNull(log)) {
                 logger.error("The message from kafka cann't convert 2 UBUserSMSLog");
                 throw new IllegalArgumentException("The message from kafka cann't convert 2 UBUserSMSLog");
@@ -102,7 +107,7 @@ public class SMSLogTopology {
         RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter("\001");
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new ZhishinetTridentFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
 
         HdfsState.Options options = new HdfsState.HdfsFileOptions()
                 .withFileNameFormat(fileNameFormat)

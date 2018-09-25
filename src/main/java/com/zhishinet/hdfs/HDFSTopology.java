@@ -47,13 +47,13 @@ public class HDFSTopology  {
         int i = 0;
         @Override
         public void nextTuple() {
-            this.spoutOutputCollector.emit(new Values(++i,"name"+i));
+            this.spoutOutputCollector.emit(new Values(++i,"name"+i,"测试"+i));
             Utils.sleep(200);
         }
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(new Fields("id","name"));
+            outputFieldsDeclarer.declare(new Fields("id","name","type"));
         }
 
     }
@@ -70,13 +70,14 @@ public class HDFSTopology  {
         public void execute(Tuple tuple) {
             Integer id = tuple.getIntegerByField("id");
             String name = tuple.getStringByField("name");
-            System.out.println("id is: " +id+" ,name is : "+ name);
-            outputCollector.emit(new Values(id,name));
+            String type = tuple.getStringByField("type");
+            System.out.println("id is: " +id+" ,name is: "+ name + " , type is: " + type);
+            outputCollector.emit(new Values(id,name,type));
         }
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(new Fields("id","name"));
+            outputFieldsDeclarer.declare(new Fields("id","name","type"));
         }
     }
 
