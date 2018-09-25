@@ -139,8 +139,8 @@ public class UBHomeworkSessionUserTrackingTopology {
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
-        builder.setBolt("splitDataBolt",new UBHomeworkAssessmentTopology.SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("splitDataBolt");
+        builder.setBolt("homeworkSessionUserTrackingBolt",new UBHomeworkSessionUserTrackingBolt(),3).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("homeworkSessionUserTrackingBolt");
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 
