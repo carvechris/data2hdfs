@@ -31,4 +31,12 @@ public class Field {
                 "createdBy","createdOn","modifiedBy",
                 "modifiedOn", "deletedBy","deletedOn");
     }
+
+    public static Fields getHomeworkSessionUserTrackingFields() {
+        return new Fields("homeworkSessionUserTrackingId","sessionId","homeworkAssessmentId","userId","noOfVisits",
+                "lastViewedOn","statusId","completedOn","score","percentScore","completeAttempts","beginDate","endDate","timeSpent",
+                "interactionTimer","articleLocation","location","isChecked","forLearnerStatus","questionIndexs","emendStatus","IsRequiredEmend",
+                "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
+                "modifiedBy","deletedOn","deletedBy","deleted");
+    }
 }
