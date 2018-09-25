@@ -1,5 +1,7 @@
 package com.zhishinet.sms;
 
+import java.util.Date;
+
 /**
  * @author tomaer
  */
@@ -14,11 +16,11 @@ public class UBUserSMSLog implements java.io.Serializable {
     private Integer state;
     private String returnMsg;
     private String postTime;
-    private String createdOn;
+    private Date createdOn;
     private Integer createdBy;
-    private String modifiedOn;
+    private Date modifiedOn;
     private String modifiedBy;
-    private String deletedOn;
+    private Date deletedOn;
     private Integer deletedBy;
     private boolean deleted;
     private String openId;
@@ -79,11 +81,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.postTime = postTime;
     }
 
-    public String getCreatedOn() {
+    public Date getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(String createdOn) {
+    public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
     }
 
@@ -95,11 +97,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.createdBy = createdBy;
     }
 
-    public String getModifiedOn() {
+    public Date getModifiedOn() {
         return modifiedOn;
     }
 
-    public void setModifiedOn(String modifiedOn) {
+    public void setModifiedOn(Date modifiedOn) {
         this.modifiedOn = modifiedOn;
     }
 
@@ -111,11 +113,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.modifiedBy = modifiedBy;
     }
 
-    public String getDeletedOn() {
+    public Date getDeletedOn() {
         return deletedOn;
     }
 
-    public void setDeletedOn(String deletedOn) {
+    public void setDeletedOn(Date deletedOn) {
         this.deletedOn = deletedOn;
     }
 

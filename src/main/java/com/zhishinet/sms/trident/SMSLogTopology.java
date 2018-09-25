@@ -2,6 +2,7 @@ package com.zhishinet.sms.trident;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
+import com.zhishinet.Utils;
 import com.zhishinet.sms.Field;
 import com.zhishinet.sms.UBUserSMSLog;
 import com.zhishinet.storm.ZhishinetTridentFileNameFormat;
@@ -82,11 +83,11 @@ public class SMSLogTopology {
 
                 values.add(StringUtils.isNotBlank(log.getReturnMsg()) ? log.getReturnMsg() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getPostTime()) ? log.getPostTime() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
+                values.add(null != log.getCreatedOn() ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
                 values.add((!Objects.isNull(log.getCreatedBy())) ? log.getCreatedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getModifiedOn()) ? log.getModifiedOn() : "\\N");
+                values.add(null != log.getModifiedOn() ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
                 values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getDeletedOn()) ? log.getDeletedOn() : "\\N");
+                values.add(null != log.getDeletedOn() ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
                 values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
                 values.add(log.isDeleted());
                 values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
