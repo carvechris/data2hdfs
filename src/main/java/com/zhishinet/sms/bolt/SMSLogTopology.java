@@ -61,45 +61,39 @@ public class SMSLogTopology {
             try {
                 log = mapper.readValue(json,UBUserSMSLog.class);
             } catch (IOException e) {
-                logger.error("",e);
-            }
-            if (Objects.isNull(log)) {
+                logger.error("Convert json to object UBUserSMSLog errror",e);
                 this.outputCollector.fail(tuple);
-            } else {
+            }
+            if(!Objects.isNull(log)) {
                 Values values = new Values();
 
                 if(null == log.getId() || log.getId() <= 0) {
                     logger.error("The message from kafka id is inValidate : {}", json);
-                    //this.outputCollector.fail(tuple);
-                    //throw new IllegalArgumentException("The message from kafka id is inValidate ");
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(log.getId());
 
                 if(StringUtils.isBlank(log.getKey())) {
                     logger.error("The message from kafka key is inValidate : {}", json);
-                    //this.outputCollector.fail(tuple);
-                    //throw new IllegalArgumentException("The message from kafka key is inValidate ");
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(log.getKey());
 
                 if(StringUtils.isBlank(log.getMobilePhoneNo())) {
                     logger.error("The message from kafka mobilePhoneNo is inValidate : {}", json);
-                    //this.outputCollector.fail(tuple);
-                    //throw new IllegalArgumentException("The message from kafka mobilePhoneNo is inValidate ");
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(log.getMobilePhoneNo());
 
                 if(StringUtils.isBlank(log.getCode())) {
                     logger.error("The message from kafka code is inValidate : {}", json);
-                    //this.outputCollector.fail(tuple);
-                    //throw new IllegalArgumentException("The message from kafka code is inValidate ");
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(log.getCode());
 
                 if(null == log.getState() || log.getState() <= 0) {
                     logger.error("The message from kafka state is inValidate : {}", json);
-                    //this.outputCollector.fail(tuple);
-                    //throw new IllegalArgumentException("The message from kafka state is inValidate ");
+                    this.outputCollector.fail(tuple);
                 }
                 values.add(log.getState());
 
@@ -132,7 +126,7 @@ public class SMSLogTopology {
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128f, FileSizeRotationPolicy.Units.MB);
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);

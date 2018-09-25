@@ -2,7 +2,6 @@ package com.zhishinet.assessment.state;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.zhishinet.assessment.Field;
 import org.apache.commons.lang.Validate;
 import org.apache.storm.mongodb.common.MongoDBClient;
@@ -14,7 +13,6 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.Query;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;

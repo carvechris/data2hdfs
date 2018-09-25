@@ -1,9 +1,9 @@
 package com.hand.zhishinet.assessment.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkAssessment;
-import com.hand.zhishinet.MyConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;

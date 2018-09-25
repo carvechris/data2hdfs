@@ -1,10 +1,10 @@
 package com.zhishinet.assessment.interaction.bolt;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.zhishinet.assessment.interaction.Field;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
+import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -13,7 +13,6 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
-import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -33,6 +32,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,7 +41,7 @@ public class HomeworkAssessmentUserInteractionTopology {
     public static final String TOPIC = "HomeworkAssessmentUserInteraction";
     public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
     public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionTopology";
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    private final static ObjectMapper mapper = new ObjectMapper();
 
     public static class SplitDataBolt extends BaseRichBolt {
 
@@ -54,42 +54,42 @@ public class HomeworkAssessmentUserInteractionTopology {
 
         @Override
         public void execute(Tuple tuple) {
-            final String data = tuple.getString(0);
-            HomeworkAssessmentUserInteraction haui = gson.fromJson(data,HomeworkAssessmentUserInteraction.class);
-            if(Objects.isNull(haui)) {
+            final String json = tuple.getString(0);
+            HomeworkAssessmentUserInteraction haui = null;
+            try {
+                haui = mapper.readValue(json,HomeworkAssessmentUserInteraction.class);
+            } catch (IOException e) {
+                logger.error("Convert json to object HomeworkAssessmentUserInteraction errror",e);
                 this.outputCollector.fail(tuple);
-            } else {
+            }
+            if (!Objects.isNull(haui)) {
                 Values values = new Values();
 
                 // HomeworkAssessmentUserInteractionId
                 if (null == haui.getHomeworkAssessmentUserInteractionId() || haui.getHomeworkAssessmentUserInteractionId() <= 0) {
-                    logger.error("The message from kafka homeworkAssessmentUserInteractionId is inValidate : {}", data);
+                    logger.error("The message from kafka homeworkAssessmentUserInteractionId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentUserInteractionId is inValidate");
                 }
                 values.add(haui.getHomeworkAssessmentUserInteractionId());
 
                 // HomeworkSessionUserTrackingId
                 if (null == haui.getHomeworkSessionUserTrackingId() || haui.getHomeworkSessionUserTrackingId() <= 0) {
-                    logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", data);
+                    logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate");
                 }
                 values.add(haui.getHomeworkSessionUserTrackingId());
 
                 // HomeworkAssessmentId
                 if (null == haui.getHomeworkAssessmentId() || haui.getHomeworkAssessmentId() <= 0) {
-                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", data);
+                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate");
                 }
                 values.add(haui.getHomeworkAssessmentId());
 
                 // QuestionId
                 if (null == haui.getQuestionId() || haui.getQuestionId() <= 0) {
-                    logger.error("The message from kafka questionId is inValidate : {}", data);
+                    logger.error("The message from kafka questionId is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka questionId is inValidate");
                 }
                 values.add(haui.getQuestionId());
                 values.add((!Objects.isNull(haui.getCorrectResponse())) ? haui.getCorrectResponse() : "\\N");
@@ -130,8 +130,8 @@ public class HomeworkAssessmentUserInteractionTopology {
         // sync the filesystem after every 1000 tuples
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 128MB
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 

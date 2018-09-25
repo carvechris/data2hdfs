@@ -1,10 +1,10 @@
 package com.zhishinet.assessment.interaction.trident;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.zhishinet.assessment.interaction.Field;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
+import com.zhishinet.storm.ZhishinetTridentFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -15,7 +15,6 @@ import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.trident.HdfsState;
 import org.apache.storm.hdfs.trident.HdfsStateFactory;
 import org.apache.storm.hdfs.trident.HdfsUpdater;
-import org.apache.storm.hdfs.trident.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.trident.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.trident.format.FileNameFormat;
 import org.apache.storm.hdfs.trident.format.RecordFormat;
@@ -32,6 +31,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class HomeworkAssessmentUserInteractionTopology {
@@ -40,7 +40,7 @@ public class HomeworkAssessmentUserInteractionTopology {
     public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
     public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionTopology";
 
-    private final static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    private final static ObjectMapper mapper = new ObjectMapper();
 
     public static class SplitData extends BaseFunction {
         private static final Logger logger = LoggerFactory.getLogger(SplitData.class);
@@ -48,38 +48,36 @@ public class HomeworkAssessmentUserInteractionTopology {
         public void execute(TridentTuple tuple, TridentCollector collector) {
             logger.info("StartParsing data from json to fields");
             final String json = tuple.getString(0);
-            HomeworkAssessmentUserInteraction haui = gson.fromJson(json, HomeworkAssessmentUserInteraction.class);
-            if (Objects.isNull(haui)) {
-                logger.error("The message from kafka cann't convert 2 HomeworkAssessmentUserInteraction");
-                throw new IllegalArgumentException("The message from kafka cann't convert 2 HomeworkAssessmentUserInteraction");
-            } else {
+            HomeworkAssessmentUserInteraction haui = null;
+            try {
+                haui = mapper.readValue(json,HomeworkAssessmentUserInteraction.class);
+            } catch (IOException e) {
+                logger.error("Convert json to object HomeworkAssessmentUserInteraction errror",e);
+            }
+            if (!Objects.isNull(haui)) {
                 Values values = new Values();
 
                 // HomeworkAssessmentUserInteractionId
                 if (null == haui.getHomeworkAssessmentUserInteractionId() || haui.getHomeworkAssessmentUserInteractionId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentUserInteractionId is inValidate : {}", json);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentUserInteractionId is inValidate");
                 }
                 values.add(haui.getHomeworkAssessmentUserInteractionId());
 
                 // HomeworkSessionUserTrackingId
                 if (null == haui.getHomeworkSessionUserTrackingId() || haui.getHomeworkSessionUserTrackingId() <= 0) {
                     logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
-                    throw new IllegalArgumentException("The message from kafka homeworkSessionUserTrackingId is inValidate");
                 }
                 values.add(haui.getHomeworkSessionUserTrackingId());
 
                 // HomeworkAssessmentId
                 if (null == haui.getHomeworkAssessmentId() || haui.getHomeworkAssessmentId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate");
                 }
                 values.add(haui.getHomeworkAssessmentId());
 
                 // QuestionId
                 if (null == haui.getQuestionId() || haui.getQuestionId() <= 0) {
                     logger.error("The message from kafka questionId is inValidate : {}", json);
-                    throw new IllegalArgumentException("The message from kafka questionId is inValidate");
                 }
                 values.add(haui.getQuestionId());
                 values.add((!Objects.isNull(haui.getCorrectResponse())) ? haui.getCorrectResponse() : "\\N");
@@ -112,8 +110,8 @@ public class HomeworkAssessmentUserInteractionTopology {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter("\001");
         // rotate files when they reach 128MB
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(128.0f, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
+        FileNameFormat fileNameFormat = new ZhishinetTridentFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
 
         HdfsState.Options options = new HdfsState.HdfsFileOptions()
                 .withFileNameFormat(fileNameFormat)

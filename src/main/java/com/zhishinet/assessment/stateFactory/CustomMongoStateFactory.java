@@ -1,6 +1,5 @@
 package com.zhishinet.assessment.stateFactory;
 
-import com.zhishinet.assessment.baseFunction.CustomSplit;
 import com.zhishinet.assessment.state.CustomMongoState;
 import org.apache.storm.task.IMetricsContext;
 import org.apache.storm.trident.state.State;
