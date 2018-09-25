@@ -70,29 +70,29 @@ public class UBHomeworkAssessmentSessionTopology {
                 Values values = new Values();
                 if(null == assessmentSession.getHomeworkAssessmentId() || assessmentSession.getHomeworkAssessmentId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
                 }
                 values.add(assessmentSession.getHomeworkAssessmentId());
 
                 if(null == assessmentSession.getAssessmentSessionId() || assessmentSession.getAssessmentSessionId() <= 0) {
                     logger.error("The message from kafka assessmentSessionId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentSessionId is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka assessmentSessionId is inValidate ");*/
                 }
                 values.add(assessmentSession.getAssessmentSessionId());
 
                 if(null == assessmentSession.getSessionId() || assessmentSession.getSessionId() <= 0) {
                     logger.error("The message from kafka sessionId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka sessionId is inValidate ");*/
                 }
                 values.add(assessmentSession.getSessionId());
 
                 if(StringUtils.isNotBlank(assessmentSession.getEmendTypeCode())) {
                     logger.error("The message from kafka emendTypeCode is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka emendTypeCode is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka emendTypeCode is inValidate ");*/
                 }
                 values.add(assessmentSession.getEmendTypeCode());
 

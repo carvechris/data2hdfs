@@ -70,43 +70,43 @@ public class UBHomeworkAssessmentTopology {
                 Values values = new Values();
                 if(null == assessment.getHomeworkAssessmentId() || assessment.getHomeworkAssessmentId() <= 0) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka homeworkAssessmentId is inValidate ");*/
                 }
                 values.add(assessment.getHomeworkAssessmentId());
 
                 if(StringUtils.isBlank(assessment.getTitle())) {
                     logger.error("The message from kafka title is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka title is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka title is inValidate ");*/
                 }
                 values.add(assessment.getTitle());
 
                 if(null == assessment.getTenantId() || assessment.getTenantId() <= 0) {
                     logger.error("The message from kafka tenantId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka tenantId is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka tenantId is inValidate ");*/
                 }
                 values.add(assessment.getTenantId());
 
                 if(null == assessment.getTimerOn()) {
                     logger.error("The message from kafka isTimerOn is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka isTimerOn is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka isTimerOn is inValidate ");*/
                 }
                 values.add(assessment.getTimerOn());
 
                 if(null == assessment.getTimerMode() || assessment.getTimerMode() <= 0) {
                     logger.error("The message from kafka timerMode is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka timerMode is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka timerMode is inValidate ");*/
                 }
                 values.add(assessment.getTimerMode());
 
                 if(null == assessment.getAssessmentQuestions() || assessment.getAssessmentQuestions() < 0) {
                     logger.error("The message from kafka assessmentQuestions is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentQuestions is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka assessmentQuestions is inValidate ");*/
                 }
                 values.add(assessment.getAssessmentQuestions());
 
@@ -120,22 +120,22 @@ public class UBHomeworkAssessmentTopology {
 
                 if(null == assessment.getTemplateType() || assessment.getTemplateType() <= 0) {
                     logger.error("The message from kafka templateType is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka templateType is inValidate ");
+                   /* this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka templateType is inValidate ");*/
                 }
                 values.add(assessment.getTemplateType());
 
                 if(null == assessment.getAssessmentBuilderType() || assessment.getAssessmentBuilderType() <= 0) {
                     logger.error("The message from kafka assessmentBuilderType is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka assessmentBuilderType is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka assessmentBuilderType is inValidate ");*/
                 }
                 values.add(assessment.getAssessmentBuilderType());
 
                 if(null == assessment.getOptionRandom()) {
                     logger.error("The message from kafka isOptionRandom is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
-                    throw new IllegalArgumentException("The message from kafka isOptionRandom is inValidate ");
+                    /*this.outputCollector.fail(tuple);
+                    throw new IllegalArgumentException("The message from kafka isOptionRandom is inValidate ");*/
                 }
                 values.add(assessment.getOptionRandom());
 
