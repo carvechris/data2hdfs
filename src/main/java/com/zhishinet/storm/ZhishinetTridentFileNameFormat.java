@@ -3,6 +3,7 @@ package com.zhishinet.storm;
 import org.apache.storm.hdfs.trident.format.FileNameFormat;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -49,7 +50,10 @@ public class ZhishinetTridentFileNameFormat implements FileNameFormat {
 
     @Override
     public String getName(long rotation, long timeStamp) {
-        return this.prefix + sdf.format(new Date()) + "/" + this.partitionIndex +  "-" + rotation + "-" + timeStamp + this.extension;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY, 8);
+        return this.prefix + sdf.format(cal.getTime()) + "/" + this.partitionIndex +  "-" + rotation + "-" + timeStamp + this.extension;
     }
 
     @Override

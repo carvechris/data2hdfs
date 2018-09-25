@@ -4,6 +4,7 @@ import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.task.TopologyContext;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -49,7 +50,10 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
 
     @Override
     public String getName(long rotation, long timeStamp) {
-        return this.prefix+ sdf.format(new Date()) + "/" + this.componentId  +  "-" + rotation + "-" + timeStamp + this.extension;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY, 8);
+        return this.prefix+ sdf.format(cal.getTime()) + "/" + this.componentId  +  "-" + rotation + "-" + timeStamp + this.extension;
     }
 
     @Override
