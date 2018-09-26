@@ -22,7 +22,7 @@ public class Field {
 
     public static final Fields kafkaMessageFields = new Fields(
             Field.ID,Field.KEY,Field.MOBILEPHONENO,Field.CODE,
-            Field.STATE,Field.RETURNMSG,Field.POSTTIME,Field.CREATEDON,
-            Field.CREATEDBY,Field.DELETED,Field.OPENID
+            Field.STATE,Field.RETURNMSG,Field.POSTTIME,Field.CREATEDON, Field.CREATEDBY,
+            Field.DELETED
     );
 }
