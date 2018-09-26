@@ -85,12 +85,12 @@ public class SMSLogTopology {
                 values.add(StringUtils.isNotBlank(log.getPostTime()) ? log.getPostTime() : "\\N");
                 values.add(null != log.getCreatedOn() ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
                 values.add((!Objects.isNull(log.getCreatedBy())) ? log.getCreatedBy() : "\\N");
-                values.add(null != log.getModifiedOn() ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
-                values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");
-                values.add(null != log.getDeletedOn() ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
-                values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
+//                values.add(null != log.getModifiedOn() ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
+//                values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");
+//                values.add(null != log.getDeletedOn() ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
+//                values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
                 values.add(log.isDeleted());
-                values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
+//                values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
                 outputCollector.emit(values);
             }
         }

@@ -18,12 +18,12 @@ public class UBUserSMSLog implements java.io.Serializable {
     private String postTime;
     private Date createdOn;
     private Integer createdBy;
-    private Date modifiedOn;
-    private String modifiedBy;
-    private Date deletedOn;
-    private Integer deletedBy;
+//    private Date modifiedOn;
+//    private String modifiedBy;
+//    private Date deletedOn;
+//    private Integer deletedBy;
     private boolean deleted;
-    private String openId;
+//    private String openId;
 
     public Integer getId() {
         return id;
@@ -97,37 +97,37 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.createdBy = createdBy;
     }
 
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    public Date getDeletedOn() {
-        return deletedOn;
-    }
-
-    public void setDeletedOn(Date deletedOn) {
-        this.deletedOn = deletedOn;
-    }
-
-    public Integer getDeletedBy() {
-        return deletedBy;
-    }
-
-    public void setDeletedBy(Integer deletedBy) {
-        this.deletedBy = deletedBy;
-    }
+//    public Date getModifiedOn() {
+//        return modifiedOn;
+//    }
+//
+//    public void setModifiedOn(Date modifiedOn) {
+//        this.modifiedOn = modifiedOn;
+//    }
+//
+//    public String getModifiedBy() {
+//        return modifiedBy;
+//    }
+//
+//    public void setModifiedBy(String modifiedBy) {
+//        this.modifiedBy = modifiedBy;
+//    }
+//
+//    public Date getDeletedOn() {
+//        return deletedOn;
+//    }
+//
+//    public void setDeletedOn(Date deletedOn) {
+//        this.deletedOn = deletedOn;
+//    }
+//
+//    public Integer getDeletedBy() {
+//        return deletedBy;
+//    }
+//
+//    public void setDeletedBy(Integer deletedBy) {
+//        this.deletedBy = deletedBy;
+//    }
 
     public boolean isDeleted() {
         return deleted;
@@ -137,11 +137,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.deleted = deleted;
     }
 
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
+//    public String getOpenId() {
+//        return openId;
+//    }
+//
+//    public void setOpenId(String openId) {
+//        this.openId = openId;
+//    }
 }
