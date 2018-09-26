@@ -83,7 +83,7 @@ public class SMSLogTopology {
 
                 values.add(StringUtils.isNotBlank(log.getReturnMsg()) ? log.getReturnMsg() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getPostTime()) ? log.getPostTime() : "\\N");
-                values.add(null != log.getCreatedOn() ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
+                values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
                 values.add((!Objects.isNull(log.getCreatedBy())) ? log.getCreatedBy() : "\\N");
 //                values.add(null != log.getModifiedOn() ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
 //                values.add((!Objects.isNull(log.getModifiedBy())) ? log.getModifiedBy() : "\\N");

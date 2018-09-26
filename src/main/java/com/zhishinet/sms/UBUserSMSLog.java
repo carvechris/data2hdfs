@@ -16,7 +16,7 @@ public class UBUserSMSLog implements java.io.Serializable {
     private Integer state;
     private String returnMsg;
     private String postTime;
-    private Date createdOn;
+    private String createdOn;
     private Integer createdBy;
 //    private Date modifiedOn;
 //    private String modifiedBy;
@@ -81,11 +81,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.postTime = postTime;
     }
 
-    public Date getCreatedOn() {
+    public String getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
 
