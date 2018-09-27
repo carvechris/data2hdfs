@@ -13,7 +13,6 @@ public class ZhishinetTridentFileNameFormat implements FileNameFormat {
     private String path = "/storm";
     private String prefix = "";
     private String extension = ".txt";
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * Overrides the default prefix.
@@ -50,6 +49,7 @@ public class ZhishinetTridentFileNameFormat implements FileNameFormat {
 
     @Override
     public String getName(long rotation, long timeStamp) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         cal.add(Calendar.HOUR_OF_DAY, 8);

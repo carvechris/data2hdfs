@@ -39,4 +39,11 @@ public class Field {
                 "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
                 "modifiedBy","deletedOn","deletedBy","deleted");
     }
+
+    public static Fields getHomeworkAssessmentEmendUserInteractionFields() {
+        return new Fields("homeworkAssessmentEmendUserInteractionId","homeworkSessionUserTrackingId","homeworkAssessmentId","questionId",
+                "sourceQuestionId","questionAnswer","correctResponse","userResponse","interactionDate","attemptNo","interactionTimeSpent","userScore",
+                "textUserResponse","feedbackViewed","createdOn","createdBy","modifiedOn",
+                "modifiedBy","deletedOn","deletedBy","isDeleted");
+    }
 }
