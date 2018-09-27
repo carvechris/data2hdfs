@@ -14,7 +14,7 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
     private String path = "/storm";
     private String prefix = "";
     private String extension = ".txt";
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Overrides the default prefix.
