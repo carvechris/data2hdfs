@@ -19,8 +19,6 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
     private String path = "/storm";
     private String prefix = "";
     private String extension = ".txt";
-    private boolean partitionFlag;
-
     /**
      * Overrides the default prefix.
      *
@@ -29,17 +27,6 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
      */
     public ZhishinetBoltFileNameFormat withPrefix(String prefix){
         this.prefix = prefix;
-        return this;
-    }
-
-    /**
-     * Overrides the default prefix.
-     *
-     * @param partitionFlag
-     * @return
-     */
-    public ZhishinetBoltFileNameFormat generatePartition(boolean partitionFlag){
-        this.partitionFlag = partitionFlag;
         return this;
     }
 
@@ -63,7 +50,6 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
     public void prepare(Map conf, TopologyContext topologyContext) {
         this.componentId = topologyContext.getThisComponentId();
         this.taskId = topologyContext.getThisTaskId();
-        logger.info("Topology Context : {}", topologyContext.toJSONString());
     }
 
     @Override
@@ -72,7 +58,7 @@ public class ZhishinetBoltFileNameFormat implements FileNameFormat {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         cal.add(Calendar.HOUR_OF_DAY, 8);
-        return this.prefix+ (this.partitionFlag?"dt=":"") +sdf.format(cal.getTime()) + "/" + this.componentId + "-" + this.taskId +  "-" + rotation + "-" + timeStamp + this.extension;
+        return this.prefix +sdf.format(cal.getTime()) + "/" + this.componentId + "-" + this.taskId +  "-" + rotation + "-" + timeStamp + this.extension;
     }
 
     @Override
