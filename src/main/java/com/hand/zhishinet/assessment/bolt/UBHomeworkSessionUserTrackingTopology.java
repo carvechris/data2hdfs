@@ -98,11 +98,6 @@ public class UBHomeworkSessionUserTrackingTopology {
                 values.add(!Objects.isNull(log.getEndDate()) ? Utils.formatDate2String(log.getEndDate()) : "\\N");
                 values.add(!Objects.isNull(log.getTimeSpent()) ? log.getTimeSpent() : "\\N");
                 values.add(!Objects.isNull(log.getInteractionTimer()) ? log.getInteractionTimer() : "\\N");
-                values.add(!Objects.isNull(log.getArticleLocation()) ? log.getArticleLocation() : "\\N");
-                values.add(!Objects.isNull(log.getLocation()) ? log.getLocation() : "\\N");
-                values.add(!Objects.isNull(log.getChecked()) ? log.getChecked() : "\\N");
-                values.add(!Objects.isNull(log.getForLearnerStatus()) ? log.getForLearnerStatus() : "\\N");
-                values.add(!Objects.isNull(log.getQuestionIndexs()) ? log.getQuestionIndexs() : "\\N");
                 values.add(!Objects.isNull(log.getEmendStatus()) ? log.getEmendStatus() : "\\N");
                 values.add(!Objects.isNull(log.getRequiredEmend()) ? log.getRequiredEmend() : "\\N");
                 values.add(!Objects.isNull(log.getSubjectId()) ? log.getSubjectId() : "\\N");
