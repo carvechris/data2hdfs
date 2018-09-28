@@ -17,7 +17,7 @@ public class LoginBuryPoint {
     private String language;
     private Integer success;
     private String errorCode;
-    private String CreatedOn;
+    private String createdOn;
 
     public Integer getUserid() {
         return userid;
@@ -164,10 +164,11 @@ public class LoginBuryPoint {
     }
 
     public String getCreatedOn() {
-        return CreatedOn;
+        return createdOn;
     }
 
-    public void setCreatedOn(String createdOn) {
-        CreatedOn = createdOn;
+    public LoginBuryPoint setCreatedOn(String createdOn) {
+        this.createdOn = createdOn;
+        return this;
     }
 }

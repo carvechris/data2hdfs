@@ -20,7 +20,7 @@ public class Field {
     public static final String LANGUAGE = "language";
     public static final String SUCCESS = "success";
     public static final String ERRORCODE = "errorCode";
-    public static final String CREATEDON = "CreatedOn";
+    public static final String CREATEDON = "createdOn";
 
     public static final Fields kafkaMessageFields = new Fields(
             Field.USERID,Field.OPENID,Field.USERNAME,Field.FULLNAME,
