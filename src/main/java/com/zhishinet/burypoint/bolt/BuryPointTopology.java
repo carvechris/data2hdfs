@@ -82,7 +82,6 @@ public class BuryPointTopology {
                 values.add(StringUtils.isNotBlank(log.getNetType()) ? log.getNetType() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getLanguage()) ? log.getLanguage() : "\\N");
                 values.add((!Objects.isNull(log.getSuccess())) ? log.getSuccess() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getNetType()) ? log.getNetType() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getErrorCode()) ? log.getErrorCode() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
 
