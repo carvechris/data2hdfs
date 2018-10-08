@@ -1,6 +1,8 @@
-package com.zhishinet.assessment;
+package com.hand.zhishinet.assessment.trident;
 
-
+import com.hand.zhishinet.MyConfig;
+import com.zhishinet.assessment.Conf;
+import com.zhishinet.assessment.Field;
 import com.zhishinet.assessment.baseStateUpdater.CustomMongoStateUpdater;
 import com.zhishinet.assessment.state.CustomMongoState;
 import com.zhishinet.assessment.stateFactory.CustomMongoStateFactory;
@@ -34,28 +36,28 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 
 /**
- * tomaer
+ * <p>Title:  data2hdfs <br/> </p>
+ * <p>Description TODO <br/> </p>
+ * <p>Company: https://www.zhishinet.com <br/> </p>
+ *
+ * @Author <a herf="q315744068@gmail.com"/>Vincent Li<a/> <br/></p>
+ * @Date 2018/10/8 11:25
  */
-public class AssessmentTopology2 {
-
-    private static Logger logger = LoggerFactory.getLogger(AssessmentTopology2.class);
-
+public class SessionUserTrackingAvgScoreTopology {
+    private static Logger logger = LoggerFactory.getLogger(SessionUserTrackingAvgScoreTopology.class);
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 
-        BrokerHosts boBrokerHosts = new ZkHosts(Conf.ZOOKEEPER_LIST);
-        final String spoutId = "HomeworkCenter_storm";
-        TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, Conf.TOPIC_HOMEWORKCENTER, spoutId);
+        BrokerHosts boBrokerHosts = new ZkHosts(MyConfig.ZK_HOSTS);
+        TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(boBrokerHosts, MyConfig.TOPIC_SessionUserTrackingAvgScore, MyConfig.SPOUT_ID_SessionUserTrackingAvgScore);
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
         // Mongo落盘方式
-        String url = "mongodb://dev:dev@10.213.0.42:37017/dev";
-        String collection = "HomeworkAssessmentAllInfo";
         MongoMapper mapper = new SimpleMongoMapper()
                 .withFields(Field.ASSESSMENTID, Field.SESSIONID, Field.SUM, Field.COUNT);
         CustomMongoState.Options options = new CustomMongoState.Options()
-                .withUrl(url)
-                .withCollectionName(collection)
+                .withUrl(MyConfig.MONGO_URL_SessionUserTrackingAvgScore)
+                .withCollectionName(MyConfig.Collection_SessionUserTrackingAvgScore)
                 .withMapper(mapper);
         StateFactory factory = new CustomMongoStateFactory(options);
 
@@ -78,7 +80,7 @@ public class AssessmentTopology2 {
 
         //1. 流计算
         //1.1 整理出流中需要的信息
-        Stream stream = topology.newStream("HomeworkCenter_topology", new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream(MyConfig.Transaction_Id, new TransactionalTridentKafkaSpout(kafkaConfig));
 
 
         Stream stream1 = stream
