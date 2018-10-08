@@ -82,6 +82,8 @@ public class MyConfig {
     public static final String TOPIC_SessionUserTrackingAvgScore = "SessionUserTrackingAvgScore";
     public static final String MONGO_URL_SessionUserTrackingAvgScore = "mongodb://dev:dev@10.213.0.42:37017/dev";
     public static final String Collection_SessionUserTrackingAvgScore = "HomeworkAssessmentAllInfo";
-    public static final String Transaction_Id = "HomeworkCenter_topology";
+    public static final String Transaction_Id_SessionUserTrackingAvgScore = "HomeworkCenter_topology";
+    public static final String Topology_Name_SessionUserTrackingAvgScore = "SessionUserTrackingAvgScore";
+    public static final String HBase_Table_Name_SessionUserTrackingAvgScore = "SessionUserTrackingAvgScore";
 
 }

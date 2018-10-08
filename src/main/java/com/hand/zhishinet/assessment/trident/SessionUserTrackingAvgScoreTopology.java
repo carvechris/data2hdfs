@@ -1,7 +1,7 @@
 package com.hand.zhishinet.assessment.trident;
 
 import com.hand.zhishinet.MyConfig;
-import com.zhishinet.assessment.Conf;
+import com.hand.zhishinet.assessment.preprocess.SessionUserTrackingAvgScorePreprocess;
 import com.zhishinet.assessment.Field;
 import com.zhishinet.assessment.baseStateUpdater.CustomMongoStateUpdater;
 import com.zhishinet.assessment.state.CustomMongoState;
@@ -65,12 +65,12 @@ public class SessionUserTrackingAvgScoreTopology {
         //HBase存储中间结果
         //HBaseState使用HBaseMapState
         HBaseMapState.Options sumOptions = new HBaseMapState.Options();
-        sumOptions.tableName = "Assessment";
+        sumOptions.tableName = MyConfig.HBase_Table_Name_SessionUserTrackingAvgScore;
         sumOptions.columnFamily = "CompletePercent";
         sumOptions.mapMapper = new SimpleTridentHBaseMapMapper("sum");
 
         HBaseMapState.Options countOptions = new HBaseMapState.Options();
-        countOptions.tableName = "Assessment";
+        countOptions.tableName = MyConfig.HBase_Table_Name_SessionUserTrackingAvgScore;
         countOptions.columnFamily = "CompletePercent";
         countOptions.mapMapper = new SimpleTridentHBaseMapMapper("count");
 
@@ -80,12 +80,12 @@ public class SessionUserTrackingAvgScoreTopology {
 
         //1. 流计算
         //1.1 整理出流中需要的信息
-        Stream stream = topology.newStream(MyConfig.Transaction_Id, new TransactionalTridentKafkaSpout(kafkaConfig));
+        Stream stream = topology.newStream(MyConfig.Transaction_Id_SessionUserTrackingAvgScore, new TransactionalTridentKafkaSpout(kafkaConfig));
 
 
         Stream stream1 = stream
                 // 先把Kafka中的数据解析成对象,包括 Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID 字段
-                .each(new Fields("str"), new PreProcessLauch2Tracking(), new Fields(Field.SESSIONUSERTRACKINGID, Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID));
+                .each(new Fields("str"), new SessionUserTrackingAvgScorePreprocess(), new Fields(Field.SESSIONUSERTRACKINGID, Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID));
 
         //1.2 分流计算Sum和Count , 最后join到一起.  并持久化到mongo中.
         logger.info("===============定义 分流到两个stream =============");
@@ -134,10 +134,10 @@ public class SessionUserTrackingAvgScoreTopology {
 
 
         if(null != args && args.length > 0) {
-            StormSubmitter.submitTopology("TridentTopology", config, topology.build());
+            StormSubmitter.submitTopology(MyConfig.Topology_Name_SessionUserTrackingAvgScore, config, topology.build());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("TridentTopology",config,topology.build());
+            cluster.submitTopology(MyConfig.Topology_Name_SessionUserTrackingAvgScore,config,topology.build());
         }
 
     }

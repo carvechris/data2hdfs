@@ -10,6 +10,15 @@ import org.apache.storm.tuple.Fields;
  */
 public class Field {
 
+    public static final String ASSESSMENTID = "AssessmentId";
+    public static final String SESSIONID = "SessionId";
+    public static final String SCORE = "Score";
+    public static final String USERID = "UserId";
+    public static final String SUM = "Sum";
+    public static final String COUNT = "Count";
+    public static final String SESSIONUSERTRACKINGID = "SessionUserTrackingId";
+    public static final String SUBJECT_ID = "SubjectId";
+
     public static Fields getHomeworkAssessmentFields(){
         return new Fields("homeworkAssessmentId","assessmentTitle","tenantId",
                 "isTimerOn","timerMode","assessmentQuestions",
@@ -39,5 +48,14 @@ public class Field {
                 "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
                 "modifiedBy","deletedOn","deletedBy","deleted");
     }
+
+    /**
+     * SessionUserTracking  AvgScore字段
+     * @return
+     */
+    public static Fields getSessionUserTrackingAvgScoreFields(){
+        return new Fields("sessionId","homeworkAssessmentId","score");
+    }
+
 
 }
