@@ -49,6 +49,107 @@ public class Field {
                 "modifiedBy","deletedOn","deletedBy","deleted");
     }
 
+    //TODO: 字段待定
+    public static Fields getUBHomeworkAssessmentUserInteractionFields() {
+        return new Fields("homeworkAssessmentUserInteractionId",
+                "homeworkSessionUserTrackingId",
+                "homeworkAssessmentId",
+                "questionId",
+                "correctResponse",
+                "userResponse",
+                "interactionDate",
+                "attemptNo",
+                "interactionTimeSpent",
+                "userScore",
+                "textUserResponse",
+                "feedbackViewed",
+                "createdOn",
+                "createdBy",
+                "modifiedOn",
+                "modifiedBy",
+                "deletedOn",
+                "deletedBy",
+                "deleted",
+                "questionAnswer",
+                "readCount",
+                "standardScore",
+                "audioPath",
+                "oralScore",
+                "guessWordTimeSpent",
+                "sessionId");
+    }
+
+    public static Fields getUBHomeworkAssessmentUserInteractionMathFields() {
+        return new Fields("homeworkAssessmentUserInteractionId",
+                "homeworkSessionUserTrackingId",
+                "homeworkAssessmentId",
+                "questionId",
+                "correctResponse",
+                "userResponse",
+                "interactionDate",
+                "attemptNo",
+                "interactionTimeSpent",
+                "userScore",
+                "textUserResponse",
+                "feedbackViewed",
+                "createdOn",
+                "createdBy",
+                "modifiedOn",
+                "modifiedBy",
+                "deletedOn",
+                "deletedBy",
+                "deleted",
+                "sessionId");
+    }
+
+    public static Fields getUBHomeworkAssessmentUserInteractionChineseFields() {
+        return new Fields("homeworkAssessmentUserInteractionId",
+                "homeworkSessionUserTrackingId",
+                "homeworkAssessmentId",
+                "questionId",
+                "correctResponse",
+                "userResponse",
+                "interactionDate",
+                "attemptNo",
+                "interactionTimeSpent",
+                "userScore",
+                "textUserResponse",
+                "feedbackViewed",
+                "createdOn",
+                "createdBy",
+                "modifiedOn",
+                "modifiedBy",
+                "deletedOn",
+                "deletedBy",
+                "deleted",
+                "sessionId");
+    }
+
+    public static Fields getUBHomeworkSessionUserTrackingAttemptDetailFields() {
+        return new Fields("homeworkSessionUserTrackingAttemptDetailId",
+                "HomeworkSessionUserTrackingId",
+                "homeworkAssessmentId",
+                "attemptNumber",
+                "noOfVisits",
+                "timeSpent",
+                "statusId",
+                "completedOn",
+                "score",
+                "percentScore",
+                "assessmentDifficulty",
+                "readCount",
+                "createdOn",
+                "createdBy",
+                "modifiedOn",
+                "modifiedBy",
+                "deletedOn",
+                "deletedBy",
+                "deleted",
+                "sessionId");
+    }
+
+
+
     /**
      * SessionUserTracking  AvgScore字段
      * @return

@@ -29,6 +29,7 @@ import org.apache.storm.trident.TridentTopology;
 import org.apache.storm.trident.operation.builtin.Count;
 import org.apache.storm.trident.operation.builtin.Sum;
 import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.trident.testing.MemoryMapState;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,7 @@ public class SessionUserTrackingAvgScoreTopology {
         countOptions.columnFamily = "CompletePercent";
         countOptions.mapMapper = new SimpleTridentHBaseMapMapper("count");
 
+        //HBaseMapState.transactional(countOptions)
 
         //0. 声明拓扑
         TridentTopology topology = new TridentTopology();
@@ -93,13 +95,13 @@ public class SessionUserTrackingAvgScoreTopology {
                 // TODO: 中间结果持久化到HBase
                 //算Count
                 stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(HBaseMapState.transactional(countOptions), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
+                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.ASSESSMENTID, Field.SESSIONID), new Count(), new Fields(Field.COUNT))
                         .newValuesStream(),
                 new Fields(Field.ASSESSMENTID, Field.SESSIONID),
 
                 //算Sum
                 stream1.groupBy(new Fields(Field.ASSESSMENTID, Field.SESSIONID))
-                        .persistentAggregate(HBaseMapState.transactional(sumOptions), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
+                        .persistentAggregate(new MemoryMapState.Factory(), new Fields(Field.SCORE), new Sum(), new Fields(Field.SUM))
                         .newValuesStream(),
                 new Fields(Field.ASSESSMENTID, Field.SESSIONID),
 
