@@ -2,8 +2,8 @@ package com.zhishinet.assessment.interaction.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
+import com.hand.zhishinet.assessment.Field;
 import com.zhishinet.Utils;
-import com.zhishinet.assessment.interaction.Field;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
 import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.commons.lang.StringUtils;
@@ -106,7 +106,7 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add(!Objects.isNull(haui.getModifiedOn()) ? Utils.formatDate2String(haui.getModifiedOn()) : "\\N");
                 values.add((!Objects.isNull(haui.getModifiedBy())) ? haui.getModifiedBy() : "\\N");
                 values.add(!Objects.isNull(haui.getDeletedOn()) ? Utils.formatDate2String(haui.getDeletedOn()) : "\\N");
-                values.add((!Objects.isNull(haui.getDeletedOn())) ? haui.getDeletedOn() : "\\N");
+                values.add((!Objects.isNull(haui.getDeletedBy())) ? haui.getDeletedBy() : "\\N");
                 values.add(haui.isDeleted());
                 values.add(StringUtils.isNotBlank(haui.getQuestionAnswer()) ? haui.getQuestionAnswer() : "\\N");
                 values.add((!Objects.isNull(haui.getReadCount())) ? haui.getReadCount() : "\\N");
@@ -114,6 +114,7 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add(StringUtils.isNotBlank(haui.getAudioPath()) ? haui.getAudioPath() : "\\N");
                 values.add((!Objects.isNull(haui.getOralScore())) ? haui.getOralScore() : "\\N");
                 values.add((!Objects.isNull(haui.getGuessWordTimeSpent())) ? haui.getGuessWordTimeSpent() : "\\N");
+                values.add((!Objects.isNull(haui.getSessionId())) ? haui.getSessionId() : "\\N");
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
             }
@@ -121,7 +122,7 @@ public class HomeworkAssessmentUserInteractionTopology {
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(Field.kafkaMessageFields);
+            outputFieldsDeclarer.declare(Field.getUBHomeworkAssessmentUserInteractionFields());
         }
     }
 
