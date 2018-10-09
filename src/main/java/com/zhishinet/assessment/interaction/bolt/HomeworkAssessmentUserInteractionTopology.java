@@ -95,7 +95,7 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add(haui.getQuestionId());
                 values.add((!Objects.isNull(haui.getCorrectResponse())) ? haui.getCorrectResponse() : "\\N");
                 values.add(StringUtils.isNotBlank(haui.getUserResponse()) ? haui.getUserResponse() : "\\N");
-                values.add(StringUtils.isNotBlank(haui.getInteractionDate()) ? haui.getInteractionDate() : "\\N");
+                values.add(!Objects.isNull(haui.getInteractionDate()) ? Utils.formatDate2String(haui.getInteractionDate()) : "\\N");
                 values.add((!Objects.isNull(haui.getAttemptNo())) ? haui.getAttemptNo() : "\\N");
                 values.add((!Objects.isNull(haui.getInteractionTimeSpent())) ? haui.getInteractionTimeSpent() : "\\N");
                 values.add((!Objects.isNull(haui.getUserScore())) ? haui.getUserScore() : "\\N");
