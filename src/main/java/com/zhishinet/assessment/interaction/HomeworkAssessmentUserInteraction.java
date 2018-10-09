@@ -1,5 +1,7 @@
 package com.zhishinet.assessment.interaction;
 
+import java.util.Date;
+
 /**
  * @author tomaer
  */
@@ -19,11 +21,11 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
     private Double userScore;
     private String textUserResponse;
     private boolean feedbackViewed;
-    private String createdOn;
+    private Date createdOn;
     private Integer createdBy;
-    private String modifiedOn;
+    private Date modifiedOn;
     private Integer modifiedBy;
-    private String deletedOn;
+    private Date deletedOn;
     private Integer deletedBy;
     private boolean deleted;
     private String questionAnswer;
@@ -142,14 +144,7 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
         return this;
     }
 
-    public String getCreatedOn() {
-        return createdOn;
-    }
 
-    public HomeworkAssessmentUserInteraction setCreatedOn(String createdOn) {
-        this.createdOn = createdOn;
-        return this;
-    }
 
     public Integer getCreatedBy() {
         return createdBy;
@@ -160,14 +155,6 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
         return this;
     }
 
-    public String getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public HomeworkAssessmentUserInteraction setModifiedOn(String modifiedOn) {
-        this.modifiedOn = modifiedOn;
-        return this;
-    }
 
     public Integer getModifiedBy() {
         return modifiedBy;
@@ -178,14 +165,6 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
         return this;
     }
 
-    public String getDeletedOn() {
-        return deletedOn;
-    }
-
-    public HomeworkAssessmentUserInteraction setDeletedOn(String deletedOn) {
-        this.deletedOn = deletedOn;
-        return this;
-    }
 
     public Integer getDeletedBy() {
         return deletedBy;
@@ -265,6 +244,33 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
 
     public HomeworkAssessmentUserInteraction setSessionId(Integer sessionId) {
         this.sessionId = sessionId;
+        return this;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public HomeworkAssessmentUserInteraction setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+        return this;
+    }
+
+    public Date getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public HomeworkAssessmentUserInteraction setModifiedOn(Date modifiedOn) {
+        this.modifiedOn = modifiedOn;
+        return this;
+    }
+
+    public Date getDeletedOn() {
+        return deletedOn;
+    }
+
+    public HomeworkAssessmentUserInteraction setDeletedOn(Date deletedOn) {
+        this.deletedOn = deletedOn;
         return this;
     }
 }
