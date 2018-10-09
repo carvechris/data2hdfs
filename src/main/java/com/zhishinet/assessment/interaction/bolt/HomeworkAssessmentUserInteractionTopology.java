@@ -2,6 +2,7 @@ package com.zhishinet.assessment.interaction.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
+import com.zhishinet.Utils;
 import com.zhishinet.assessment.interaction.Field;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
 import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
@@ -100,11 +101,11 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add((!Objects.isNull(haui.getUserScore())) ? haui.getUserScore() : "\\N");
                 values.add(StringUtils.isNotBlank(haui.getTextUserResponse()) ? haui.getTextUserResponse() : "\\N");
                 values.add(haui.isFeedbackViewed());
-                values.add(StringUtils.isNotBlank(haui.getCreatedOn()) ? haui.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(haui.getCreatedOn()) ? Utils.formatDate2String(haui.getCreatedOn()) : "\\N");
                 values.add((!Objects.isNull(haui.getCreatedBy())) ? haui.getCreatedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(haui.getModifiedOn()) ? haui.getModifiedOn() : "\\N");
+                values.add(!Objects.isNull(haui.getModifiedOn()) ? Utils.formatDate2String(haui.getModifiedOn()) : "\\N");
                 values.add((!Objects.isNull(haui.getModifiedBy())) ? haui.getModifiedBy() : "\\N");
-                values.add(StringUtils.isNotBlank(haui.getDeletedOn()) ? haui.getDeletedOn() : "\\N");
+                values.add(!Objects.isNull(haui.getDeletedOn()) ? Utils.formatDate2String(haui.getDeletedOn()) : "\\N");
                 values.add((!Objects.isNull(haui.getDeletedOn())) ? haui.getDeletedOn() : "\\N");
                 values.add(haui.isDeleted());
                 values.add(StringUtils.isNotBlank(haui.getQuestionAnswer()) ? haui.getQuestionAnswer() : "\\N");
