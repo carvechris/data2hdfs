@@ -15,7 +15,7 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
     private Integer questionId;
     private Integer correctResponse;
     private String userResponse;
-    private String interactionDate;
+    private Date interactionDate;
     private Integer attemptNo;
     private Integer interactionTimeSpent;
     private Double userScore;
@@ -90,11 +90,11 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
         return this;
     }
 
-    public String getInteractionDate() {
+    public Date getInteractionDate() {
         return interactionDate;
     }
 
-    public HomeworkAssessmentUserInteraction setInteractionDate(String interactionDate) {
+    public HomeworkAssessmentUserInteraction setInteractionDate(Date interactionDate) {
         this.interactionDate = interactionDate;
         return this;
     }
