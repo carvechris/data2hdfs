@@ -7,9 +7,9 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
 
     private static final long serialVersionUID = -6381729196769192838L;
 
-    private Integer homeworkAssessmentUserInteractionId;
-    private Integer homeworkSessionUserTrackingId;
-    private Integer homeworkAssessmentId;
+    private Long homeworkAssessmentUserInteractionId;
+    private Long homeworkSessionUserTrackingId;
+    private Long homeworkAssessmentId;
     private Integer questionId;
     private Integer correctResponse;
     private String userResponse;
@@ -32,204 +32,239 @@ public class HomeworkAssessmentUserInteraction implements java.io.Serializable {
     private String audioPath;
     private Integer oralScore;
     private Integer guessWordTimeSpent;
+    private Integer sessionId;
 
-    public Integer getHomeworkAssessmentUserInteractionId() {
+    public Long getHomeworkAssessmentUserInteractionId() {
         return homeworkAssessmentUserInteractionId;
     }
 
-    public void setHomeworkAssessmentUserInteractionId(Integer homeworkAssessmentUserInteractionId) {
+    public HomeworkAssessmentUserInteraction setHomeworkAssessmentUserInteractionId(Long homeworkAssessmentUserInteractionId) {
         this.homeworkAssessmentUserInteractionId = homeworkAssessmentUserInteractionId;
+        return this;
     }
 
-    public Integer getHomeworkSessionUserTrackingId() {
+    public Long getHomeworkSessionUserTrackingId() {
         return homeworkSessionUserTrackingId;
     }
 
-    public void setHomeworkSessionUserTrackingId(Integer homeworkSessionUserTrackingId) {
+    public HomeworkAssessmentUserInteraction setHomeworkSessionUserTrackingId(Long homeworkSessionUserTrackingId) {
         this.homeworkSessionUserTrackingId = homeworkSessionUserTrackingId;
+        return this;
     }
 
-    public Integer getHomeworkAssessmentId() {
+    public Long getHomeworkAssessmentId() {
         return homeworkAssessmentId;
     }
 
-    public void setHomeworkAssessmentId(Integer homeworkAssessmentId) {
+    public HomeworkAssessmentUserInteraction setHomeworkAssessmentId(Long homeworkAssessmentId) {
         this.homeworkAssessmentId = homeworkAssessmentId;
+        return this;
     }
 
     public Integer getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Integer questionId) {
+    public HomeworkAssessmentUserInteraction setQuestionId(Integer questionId) {
         this.questionId = questionId;
+        return this;
     }
 
     public Integer getCorrectResponse() {
         return correctResponse;
     }
 
-    public void setCorrectResponse(Integer correctResponse) {
+    public HomeworkAssessmentUserInteraction setCorrectResponse(Integer correctResponse) {
         this.correctResponse = correctResponse;
+        return this;
     }
 
     public String getUserResponse() {
         return userResponse;
     }
 
-    public void setUserResponse(String userResponse) {
+    public HomeworkAssessmentUserInteraction setUserResponse(String userResponse) {
         this.userResponse = userResponse;
+        return this;
     }
 
     public String getInteractionDate() {
         return interactionDate;
     }
 
-    public void setInteractionDate(String interactionDate) {
+    public HomeworkAssessmentUserInteraction setInteractionDate(String interactionDate) {
         this.interactionDate = interactionDate;
+        return this;
     }
 
     public Integer getAttemptNo() {
         return attemptNo;
     }
 
-    public void setAttemptNo(Integer attemptNo) {
+    public HomeworkAssessmentUserInteraction setAttemptNo(Integer attemptNo) {
         this.attemptNo = attemptNo;
+        return this;
     }
 
     public Integer getInteractionTimeSpent() {
         return interactionTimeSpent;
     }
 
-    public void setInteractionTimeSpent(Integer interactionTimeSpent) {
+    public HomeworkAssessmentUserInteraction setInteractionTimeSpent(Integer interactionTimeSpent) {
         this.interactionTimeSpent = interactionTimeSpent;
+        return this;
     }
 
     public Double getUserScore() {
         return userScore;
     }
 
-    public void setUserScore(Double userScore) {
+    public HomeworkAssessmentUserInteraction setUserScore(Double userScore) {
         this.userScore = userScore;
+        return this;
     }
 
     public String getTextUserResponse() {
         return textUserResponse;
     }
 
-    public void setTextUserResponse(String textUserResponse) {
+    public HomeworkAssessmentUserInteraction setTextUserResponse(String textUserResponse) {
         this.textUserResponse = textUserResponse;
+        return this;
     }
 
     public boolean isFeedbackViewed() {
         return feedbackViewed;
     }
 
-    public void setFeedbackViewed(boolean feedbackViewed) {
+    public HomeworkAssessmentUserInteraction setFeedbackViewed(boolean feedbackViewed) {
         this.feedbackViewed = feedbackViewed;
+        return this;
     }
 
     public String getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(String createdOn) {
+    public HomeworkAssessmentUserInteraction setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
+        return this;
     }
 
     public Integer getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Integer createdBy) {
+    public HomeworkAssessmentUserInteraction setCreatedBy(Integer createdBy) {
         this.createdBy = createdBy;
+        return this;
     }
 
     public String getModifiedOn() {
         return modifiedOn;
     }
 
-    public void setModifiedOn(String modifiedOn) {
+    public HomeworkAssessmentUserInteraction setModifiedOn(String modifiedOn) {
         this.modifiedOn = modifiedOn;
+        return this;
     }
 
     public Integer getModifiedBy() {
         return modifiedBy;
     }
 
-    public void setModifiedBy(Integer modifiedBy) {
+    public HomeworkAssessmentUserInteraction setModifiedBy(Integer modifiedBy) {
         this.modifiedBy = modifiedBy;
+        return this;
     }
 
     public String getDeletedOn() {
         return deletedOn;
     }
 
-    public void setDeletedOn(String deletedOn) {
+    public HomeworkAssessmentUserInteraction setDeletedOn(String deletedOn) {
         this.deletedOn = deletedOn;
+        return this;
     }
 
     public Integer getDeletedBy() {
         return deletedBy;
     }
 
-    public void setDeletedBy(Integer deletedBy) {
+    public HomeworkAssessmentUserInteraction setDeletedBy(Integer deletedBy) {
         this.deletedBy = deletedBy;
+        return this;
     }
 
     public boolean isDeleted() {
         return deleted;
     }
 
-    public void setDeleted(boolean deleted) {
+    public HomeworkAssessmentUserInteraction setDeleted(boolean deleted) {
         this.deleted = deleted;
+        return this;
     }
 
     public String getQuestionAnswer() {
         return questionAnswer;
     }
 
-    public void setQuestionAnswer(String questionAnswer) {
+    public HomeworkAssessmentUserInteraction setQuestionAnswer(String questionAnswer) {
         this.questionAnswer = questionAnswer;
+        return this;
     }
 
     public Integer getReadCount() {
         return readCount;
     }
 
-    public void setReadCount(Integer readCount) {
+    public HomeworkAssessmentUserInteraction setReadCount(Integer readCount) {
         this.readCount = readCount;
+        return this;
     }
 
     public Integer getStandardScore() {
         return standardScore;
     }
 
-    public void setStandardScore(Integer standardScore) {
+    public HomeworkAssessmentUserInteraction setStandardScore(Integer standardScore) {
         this.standardScore = standardScore;
+        return this;
     }
 
     public String getAudioPath() {
         return audioPath;
     }
 
-    public void setAudioPath(String audioPath) {
+    public HomeworkAssessmentUserInteraction setAudioPath(String audioPath) {
         this.audioPath = audioPath;
+        return this;
     }
 
     public Integer getOralScore() {
         return oralScore;
     }
 
-    public void setOralScore(Integer oralScore) {
+    public HomeworkAssessmentUserInteraction setOralScore(Integer oralScore) {
         this.oralScore = oralScore;
+        return this;
     }
 
     public Integer getGuessWordTimeSpent() {
         return guessWordTimeSpent;
     }
 
-    public void setGuessWordTimeSpent(Integer guessWordTimeSpent) {
+    public HomeworkAssessmentUserInteraction setGuessWordTimeSpent(Integer guessWordTimeSpent) {
         this.guessWordTimeSpent = guessWordTimeSpent;
+        return this;
+    }
+
+    public Integer getSessionId() {
+        return sessionId;
+    }
+
+    public HomeworkAssessmentUserInteraction setSessionId(Integer sessionId) {
+        this.sessionId = sessionId;
+        return this;
     }
 }
