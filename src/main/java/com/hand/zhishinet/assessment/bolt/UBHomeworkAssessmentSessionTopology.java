@@ -87,7 +87,7 @@ public class UBHomeworkAssessmentSessionTopology {
                 }
                 values.add(assessmentSession.getSessionId());
 
-                if(StringUtils.isNotBlank(assessmentSession.getEmendTypeCode())) {
+                if(StringUtils.isBlank(assessmentSession.getEmendTypeCode())) {
                     logger.error("The message from kafka emendTypeCode is inValidate : {}", json);
                     this.outputCollector.fail(tuple);
                 }
