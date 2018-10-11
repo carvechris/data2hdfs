@@ -127,7 +127,7 @@ public class Field {
 
     public static Fields getUBHomeworkSessionUserTrackingAttemptDetailFields() {
         return new Fields("homeworkSessionUserTrackingAttemptDetailId",
-                "HomeworkSessionUserTrackingId",
+                "homeworkSessionUserTrackingId",
                 "homeworkAssessmentId",
                 "attemptNumber",
                 "noOfVisits",
