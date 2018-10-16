@@ -39,9 +39,6 @@ import java.util.Objects;
 
 public class HomeworkAssessmentUserInteractionTopology {
 
-    public static final String TOPIC = "HomeworkAssessmentUserInteraction";
-    public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
-    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionTopology";
     private final static ObjectMapper mapper = new ObjectMapper();
 
     public static class SplitDataBolt extends BaseRichBolt {
@@ -56,6 +53,7 @@ public class HomeworkAssessmentUserInteractionTopology {
         @Override
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
+            logger.info("json : {}",json);
             HomeworkAssessmentUserInteraction haui = null;
             try {
                 haui = mapper.readValue(json,HomeworkAssessmentUserInteraction.class);
@@ -65,34 +63,38 @@ public class HomeworkAssessmentUserInteractionTopology {
             }
             if (!Objects.isNull(haui)) {
                 Values values = new Values();
-
                 // HomeworkAssessmentUserInteractionId
                 if (null == haui.getHomeworkAssessmentUserInteractionId() || haui.getHomeworkAssessmentUserInteractionId() <= 0) {
-                    logger.error("The message from kafka homeworkAssessmentUserInteractionId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
+                    logger.error("The message from kafka homeworkAssessmentUserInteractionId is inValidate");
+                    return;
+                } else {
+                    values.add(haui.getHomeworkAssessmentUserInteractionId());
                 }
-                values.add(haui.getHomeworkAssessmentUserInteractionId());
 
                 // HomeworkSessionUserTrackingId
                 if (null == haui.getHomeworkSessionUserTrackingId() || haui.getHomeworkSessionUserTrackingId() <= 0) {
-                    logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
+                    logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate");
+                    return;
+                } else {
+                    values.add(haui.getHomeworkSessionUserTrackingId());
                 }
-                values.add(haui.getHomeworkSessionUserTrackingId());
 
                 // HomeworkAssessmentId
                 if (null == haui.getHomeworkAssessmentId() || haui.getHomeworkAssessmentId() <= 0) {
-                    logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
+                    logger.error("The message from kafka homeworkAssessmentId is inValidate");
+                    return;
+                } else {
+                    values.add(haui.getHomeworkAssessmentId());
                 }
-                values.add(haui.getHomeworkAssessmentId());
 
                 // QuestionId
                 if (null == haui.getQuestionId() || haui.getQuestionId() <= 0) {
-                    logger.error("The message from kafka questionId is inValidate : {}", json);
-                    this.outputCollector.fail(tuple);
+                    logger.error("The message from kafka questionId is inValidate");
+                    return;
+                } else {
+                    values.add(haui.getQuestionId());
                 }
-                values.add(haui.getQuestionId());
+
                 values.add((!Objects.isNull(haui.getCorrectResponse())) ? haui.getCorrectResponse() : "\\N");
                 values.add(StringUtils.isNotBlank(haui.getUserResponse()) ? haui.getUserResponse() : "\\N");
                 values.add(!Objects.isNull(haui.getInteractionDate()) ? Utils.formatDate2String(haui.getInteractionDate()) : "\\N");
@@ -127,13 +129,14 @@ public class HomeworkAssessmentUserInteractionTopology {
     }
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
+        final String TOPIC = args[0];
+        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,TOPIC.toLowerCase()+"storm");
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         // sync the filesystem after every 1000 tuples
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/"+TOPIC+"/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
@@ -147,10 +150,10 @@ public class HomeworkAssessmentUserInteractionTopology {
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
 //            config.setNumWorkers(3);
-            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
+            StormSubmitter.submitTopology(TOPIC+"Topology", config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
+            cluster.submitTopology(TOPIC+"Topology",config,builder.createTopology());
         }
     }
 }

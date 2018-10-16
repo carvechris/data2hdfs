@@ -9,7 +9,7 @@ public class UBUserSMSLog implements java.io.Serializable {
 
     private static final long serialVersionUID = 1115891903247216098L;
 
-    private Integer id;
+    private Long id;
     private String key;
     private String mobilePhoneNo;
     private String code;
@@ -35,11 +35,11 @@ public class UBUserSMSLog implements java.io.Serializable {
         this.callbackId = callbackId;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
