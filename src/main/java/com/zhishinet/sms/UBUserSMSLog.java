@@ -23,7 +23,17 @@ public class UBUserSMSLog implements java.io.Serializable {
 //    private Date deletedOn;
 //    private Integer deletedBy;
     private boolean deleted;
+    private String callbackId;
 //    private String openId;
+
+
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
 
     public Integer getId() {
         return id;

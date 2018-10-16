@@ -90,6 +90,7 @@ public class SMSLogTopology {
 //                values.add(null != log.getDeletedOn() ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
 //                values.add((!Objects.isNull(log.getDeletedBy())) ? log.getDeletedBy() : "\\N");
                 values.add(log.isDeleted());
+                values.add(StringUtils.isNotBlank(log.getCallbackId()) ? log.getCallbackId() : "\\N");
 //                values.add(StringUtils.isNotBlank(log.getOpenId()) ? log.getOpenId(): "\\N");
                 outputCollector.emit(values);
             }
