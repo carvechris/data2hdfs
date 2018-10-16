@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class UBHomeworkSessionUserTrackingAttemptDetailTopology {
-    public static final String TOPIC = "UBHomeworkSessionUserTrackingAttemptDetail";
+    public static final String TOPIC = "HomeworkSessionUserTrackingAttemptDetail";
     public static final String SPOUTID = "ubhomeworksessionusertrackingattemptdetailstorm";
     public static final String TOPOLOGY_NAME = "UBHomeworkSessionUserTrackingAttemptDetailTopology";
 
