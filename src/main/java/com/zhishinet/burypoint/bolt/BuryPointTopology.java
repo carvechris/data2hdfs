@@ -105,8 +105,7 @@ public class BuryPointTopology {
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/BuryPoint/").withExtension(".txt");
-        HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
-                .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
+        HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat);
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
