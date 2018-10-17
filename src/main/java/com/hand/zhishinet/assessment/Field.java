@@ -19,34 +19,35 @@ public class Field {
     public static final String SESSIONUSERTRACKINGID = "SessionUserTrackingId";
     public static final String SUBJECT_ID = "SubjectId";
 
-    public static Fields getHomeworkAssessmentFields(){
-        return new Fields("homeworkAssessmentId","assessmentTitle","tenantId",
-                "isTimerOn","timerMode","assessmentQuestions",
-                "isDeleted","templateType","assessmentBuilderType",
-                "isOptionRandom","minimumPassPercentage","beginDate",
-                "endDate","assessmentClassification","duration",
-                "allowBack","allowSkip","disableFeedback",
-                "assessmentBuilderId","subjectId","isOral",
-                "showSubTitle","displayOrder","textbookId",
-                "textbookSeriesId","assessmentIntroText","createdBy",
-                "createdOn","modifiedBy","modifiedOn",
-                "deletedBy","deletedOn");
+    public static Fields getHomeworkAssessmentFields() {
+        return new Fields("homeworkAssessmentId", "assessmentTitle", "tenantId",
+                "isTimerOn", "timerMode", "assessmentQuestions",
+                "isDeleted", "templateType", "assessmentBuilderType",
+                "isOptionRandom", "minimumPassPercentage", "beginDate",
+                "endDate", "assessmentClassification", "duration",
+                "allowBack", "allowSkip", "disableFeedback",
+                "assessmentBuilderId", "subjectId", "isOral",
+                "showSubTitle", "displayOrder", "textbookId",
+                "textbookSeriesId", "assessmentIntroText", "createdBy",
+                "createdOn", "modifiedBy", "modifiedOn",
+                "deletedBy", "deletedOn", "homeworkType",
+                "isQuestionRandom");
     }
 
-    public static Fields getHomeworkAssessmentSessionFields(){
-        return new Fields("homeworkAssessmentId","assessmentSessionId","sessionId",
-                "emendTypeCode","isClose","isRequire",
-                "isRequiredEmend", "isDeleted","sessionGroupId",
-                "createdBy","createdOn","modifiedBy",
-                "modifiedOn", "deletedBy","deletedOn");
+    public static Fields getHomeworkAssessmentSessionFields() {
+        return new Fields("homeworkAssessmentId", "assessmentSessionId", "sessionId",
+                "emendTypeCode", "isClose", "isRequire",
+                "isRequiredEmend", "isDeleted", "sessionGroupId",
+                "createdBy", "createdOn", "modifiedBy",
+                "modifiedOn", "deletedBy", "deletedOn", "homeworkType");
     }
 
     public static Fields getHomeworkSessionUserTrackingFields() {
-        return new Fields("homeworkSessionUserTrackingId","sessionId","homeworkAssessmentId","userId","noOfVisits",
-                "lastViewedOn","statusId","completedOn","score","percentScore","completeAttempts","beginDate","endDate","timeSpent",
-                "interactionTimer","emendStatus","IsRequiredEmend",
-                "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
-                "modifiedBy","deletedOn","deletedBy","deleted");
+        return new Fields("homeworkSessionUserTrackingId", "sessionId", "homeworkAssessmentId", "userId", "noOfVisits",
+                "lastViewedOn", "statusId", "completedOn", "score", "percentScore", "completeAttempts", "beginDate", "endDate", "timeSpent",
+                "interactionTimer", "emendStatus", "IsRequiredEmend",
+                "subjectId", "readCount", "showSubTitle", "emendTypeCode", "sessionGroupId", "displayOrder", "createdOn", "createdBy", "modifiedOn",
+                "modifiedBy", "deletedOn", "deletedBy", "deleted", "homeworkType", "standardLevel", "standardConf", "ocrErrorMsg");
     }
 
     //TODO: 字段待定
@@ -148,15 +149,12 @@ public class Field {
                 "sessionId");
     }
 
-
-
     /**
      * SessionUserTracking  AvgScore字段
+     *
      * @return
      */
-    public static Fields getSessionUserTrackingAvgScoreFields(){
-        return new Fields("sessionId","homeworkAssessmentId","score");
+    public static Fields getSessionUserTrackingAvgScoreFields() {
+        return new Fields("sessionId", "homeworkAssessmentId", "score");
     }
-
-
 }

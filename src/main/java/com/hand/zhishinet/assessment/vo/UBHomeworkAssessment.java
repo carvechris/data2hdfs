@@ -3,14 +3,14 @@ package com.hand.zhishinet.assessment.vo;
 import java.util.Date;
 
 /**
- * @author zong.liu01@hand-china.com  2018/9/18 17:56
+ * @author zong.liu01@hand-china.com  2018/10/16 1:00
  * @version 1.0
- * @name zhishinet-bigData
- * @description
+ * @name CombineLaunch
+ * @description HDFS中的表(UBHomeworkAssessment)对应的类
  */
-public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializable {
+public class UBHomeworkAssessment implements java.io.Serializable {
 
-    private static final long serialVersionUID = 11158919214416098L;
+    private static final long serialVersionUID = -2121221213422L;
 
     private Long homeworkAssessmentId;
     private String title;
@@ -37,24 +37,16 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
     private Integer displayOrder;
     private Integer textbookSeriesId;
     private Integer textbookId;
+    private String homeworkType;
+    private Boolean isQuestionRandom;
 
-    public Integer getTextbookSeriesId() {
-        return textbookSeriesId;
-    }
-
-    public void setTextbookSeriesId(Integer textbookSeriesId) {
-        this.textbookSeriesId = textbookSeriesId;
-    }
-
-    public Integer getTextbookId() {
-        return textbookId;
-    }
-
-    public void setTextbookId(Integer textbookId) {
-        this.textbookId = textbookId;
-    }
-
-
+    protected Date createdOn;
+    protected Integer createdBy;
+    protected Date modifiedOn;
+    protected Integer modifiedBy;
+    protected Date deletedOn;
+    protected Integer deletedBy;
+    protected Boolean isDeleted;
 
     public Long getHomeworkAssessmentId() {
         return homeworkAssessmentId;
@@ -62,6 +54,22 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
 
     public void setHomeworkAssessmentId(Long homeworkAssessmentId) {
         this.homeworkAssessmentId = homeworkAssessmentId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getIntroText() {
+        return introText;
+    }
+
+    public void setIntroText(String introText) {
+        this.introText = introText;
     }
 
     public Integer getTenantId() {
@@ -224,20 +232,91 @@ public class UBHomeworkAssessment extends BaseDTO implements java.io.Serializabl
         this.displayOrder = displayOrder;
     }
 
-    public String getTitle() {
-        return title;
+    public Integer getTextbookSeriesId() {
+        return textbookSeriesId;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTextbookSeriesId(Integer textbookSeriesId) {
+        this.textbookSeriesId = textbookSeriesId;
     }
 
-    public String getIntroText() {
-        return introText;
+    public Integer getTextbookId() {
+        return textbookId;
     }
 
-    public void setIntroText(String introText) {
-        this.introText = introText;
+    public void setTextbookId(Integer textbookId) {
+        this.textbookId = textbookId;
     }
 
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(Date modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public Integer getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(Integer modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Date getDeletedOn() {
+        return deletedOn;
+    }
+
+    public void setDeletedOn(Date deletedOn) {
+        this.deletedOn = deletedOn;
+    }
+
+    public Integer getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(Integer deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public String getHomeworkType() {
+        return homeworkType;
+    }
+
+    public void setHomeworkType(String homeworkType) {
+        this.homeworkType = homeworkType;
+    }
+
+    public Boolean getQuestionRandom() {
+        return isQuestionRandom;
+    }
+
+    public void setQuestionRandom(Boolean questionRandom) {
+        isQuestionRandom = questionRandom;
+    }
 }

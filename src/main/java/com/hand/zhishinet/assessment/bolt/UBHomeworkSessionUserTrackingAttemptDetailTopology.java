@@ -3,7 +3,6 @@ package com.hand.zhishinet.assessment.bolt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
-import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTracking;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTrackingAttemptDetail;
 import com.zhishinet.Utils;
 import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
@@ -55,59 +54,58 @@ public class UBHomeworkSessionUserTrackingAttemptDetailTopology {
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
             ObjectMapper mapper = new ObjectMapper();
-            UBHomeworkSessionUserTrackingAttemptDetail log = null;
+            UBHomeworkSessionUserTrackingAttemptDetail trackingAttemptDetail = null;
             try {
-                log = mapper.readValue(json,UBHomeworkSessionUserTrackingAttemptDetail.class);
+                trackingAttemptDetail = mapper.readValue(json, UBHomeworkSessionUserTrackingAttemptDetail.class);
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("The message from kafka, the data is {}", e.getMessage());
                 logger.error("The message from kafka transfer to UBHomeworkSessionUserTrackingAttemptDetail error: {}", e.getMessage());
             }
-            if (Objects.isNull(log)) {
+            if (Objects.isNull(trackingAttemptDetail)) {
                 this.collector.fail(tuple);
             } else {
                 Values values = new Values();
-                if (log.getHomeworksessionUserTrackingAttemptDetailId() == null) {
+                if (trackingAttemptDetail.getHomeworksessionUserTrackingAttemptDetailId() == null) {
                     logger.error("The message from kafka homeworksessionUserTrackingAttemptDetailId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getHomeworksessionUserTrackingAttemptDetailId());
-                if (log.getHomeworkSessionUserTrackingId() == null) {
+                values.add(trackingAttemptDetail.getHomeworksessionUserTrackingAttemptDetailId());
+                if (trackingAttemptDetail.getHomeworkSessionUserTrackingId() == null) {
                     logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getHomeworkSessionUserTrackingId());
-                if (log.getHomeworkAssessmentId() == null) {
+                values.add(trackingAttemptDetail.getHomeworkSessionUserTrackingId());
+                if (trackingAttemptDetail.getHomeworkAssessmentId() == null) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getHomeworkAssessmentId());
-                if (log.getAttemptNumber() == null) {
+                values.add(trackingAttemptDetail.getHomeworkAssessmentId());
+                if (trackingAttemptDetail.getAttemptNumber() == null) {
                     logger.error("The message from kafka attemptNumber is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getAttemptNumber());
-                values.add(!Objects.isNull(log.getNoOfVisits()) ? log.getNoOfVisits() : "\\N");
-                values.add(!Objects.isNull(log.getTimeSpent()) ? log.getTimeSpent() : "\\N");
-                values.add(!Objects.isNull(log.getStatusId()) ? log.getStatusId() : "\\N");
-                values.add(!Objects.isNull(log.getCompletedOn()) ? Utils.formatDate2String(log.getCompletedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getScore()) ? log.getScore() : "\\N");
-                values.add(!Objects.isNull(log.getPercentScore()) ? log.getPercentScore() : "\\N");
-                values.add(!Objects.isNull(log.getAssessmentDifficulty()) ? log.getAssessmentDifficulty() : "\\N");
-                values.add(!Objects.isNull(log.getReadCount()) ? log.getReadCount() : "\\N");
-                values.add(!Objects.isNull(log.getCreatedOn()) ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getCreatedBy()) ? log.getCreatedBy() : "\\N");
-                values.add(!Objects.isNull(log.getModifiedOn()) ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getModifiedBy()) ? log.getModifiedBy() : "\\N");
-                values.add(!Objects.isNull(log.getDeletedOn()) ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getDeletedBy()) ? log.getDeletedBy() : "\\N");
-                values.add(!Objects.isNull(log.getDeleted()) ? log.getDeleted() : "\\N");
-                values.add(!Objects.isNull(log.getSessionId()) ? log.getSessionId() : "\\N");
+                values.add(trackingAttemptDetail.getAttemptNumber());
+                values.add(!Objects.isNull(trackingAttemptDetail.getNoOfVisits()) ? trackingAttemptDetail.getNoOfVisits() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getTimeSpent()) ? trackingAttemptDetail.getTimeSpent() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getStatusId()) ? trackingAttemptDetail.getStatusId() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getCompletedOn()) ? Utils.formatDate2String(trackingAttemptDetail.getCompletedOn()) : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getScore()) ? trackingAttemptDetail.getScore() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getPercentScore()) ? trackingAttemptDetail.getPercentScore() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getAssessmentDifficulty()) ? trackingAttemptDetail.getAssessmentDifficulty() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getReadCount()) ? trackingAttemptDetail.getReadCount() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getCreatedOn()) ? Utils.formatDate2String(trackingAttemptDetail.getCreatedOn()) : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getCreatedBy()) ? trackingAttemptDetail.getCreatedBy() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getModifiedOn()) ? Utils.formatDate2String(trackingAttemptDetail.getModifiedOn()) : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getModifiedBy()) ? trackingAttemptDetail.getModifiedBy() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getDeletedOn()) ? Utils.formatDate2String(trackingAttemptDetail.getDeletedOn()) : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getDeletedBy()) ? trackingAttemptDetail.getDeletedBy() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getDeleted()) ? trackingAttemptDetail.getDeleted() : "\\N");
+                values.add(!Objects.isNull(trackingAttemptDetail.getSessionId()) ? trackingAttemptDetail.getSessionId() : "\\N");
 
                 this.collector.ack(tuple);
                 this.collector.emit(values);
             }
-
         }
 
         @Override
@@ -118,7 +116,7 @@ public class UBHomeworkSessionUserTrackingAttemptDetailTopology {
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
 
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
+        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS, MyConfig.ZK_ROOT, SPOUTID);
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
@@ -128,18 +126,18 @@ public class UBHomeworkSessionUserTrackingAttemptDetailTopology {
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
-        builder.setBolt("homeworkSessionUserTrackingAttemptDetailBolt",new UBHomeworkSessionUserTrackingAttemptDetailBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("homeworkSessionUserTrackingAttemptDetailBolt");
+        builder.setSpout("kafkaSpout", new KafkaSpout(spoutConfig), 3);
+        builder.setBolt("homeworkSessionUserTrackingAttemptDetailBolt", new UBHomeworkSessionUserTrackingAttemptDetailBolt(), 3).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt", hdfsBolt, 3).shuffleGrouping("homeworkSessionUserTrackingAttemptDetailBolt");
 
-        Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
+        Config config = MyConfig.getConfigWithKafkaConsumerProps(false, MyConfig.KAFKA_BROKERS);
 
-        if(null != args && args.length > 0) {
+        if (null != args && args.length > 0) {
             //config.setNumWorkers(3);
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
+            cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         }
     }
 }

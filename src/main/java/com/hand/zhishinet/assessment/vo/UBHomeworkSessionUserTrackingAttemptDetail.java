@@ -4,21 +4,20 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * <p>Title:  zhishinet-app-student <br/> </p>
- * <p>Description TODO <br/> </p>
- * <p>Company: https://www.zhishinet.com <br/> </p>
- *
- * @Author <a herf="q315744068@gmail.com"/>Vincent Li<a/> <br/></p>
- * @Date 2018/10/11 14:11
+ * @author zong.liu01@hand-china.com  2018/10/16 1:00
+ * @version 1.0
+ * @name CombineLaunch
+ * @description HDFS中的表(HomeworkSessionUserTrackingAttemptDetail)对应的类
  */
 public class UBHomeworkSessionUserTrackingAttemptDetail implements Serializable{
 
+    private static final long serialVersionUID = -1898672688656034L;
     private Long homeworksessionUserTrackingAttemptDetailId;
     private Long homeworkSessionUserTrackingId;
     private Long homeworkAssessmentId;
     private Integer attemptNumber;
     private Integer noOfVisits;
-    private Integer timeSpent;
+    private Long timeSpent;
     private Integer statusId;
     private Date completedOn;
     private Float score;
@@ -31,7 +30,7 @@ public class UBHomeworkSessionUserTrackingAttemptDetail implements Serializable{
     private Integer modifiedBy;
     private Date deletedOn;
     private Integer deletedBy;
-    private Boolean deleted = false;
+    private Boolean deleted = Boolean.FALSE;
     private Integer sessionId;
 
     public Long getHomeworksessionUserTrackingAttemptDetailId() {
@@ -79,11 +78,11 @@ public class UBHomeworkSessionUserTrackingAttemptDetail implements Serializable{
         return this;
     }
 
-    public Integer getTimeSpent() {
+    public Long getTimeSpent() {
         return timeSpent;
     }
 
-    public UBHomeworkSessionUserTrackingAttemptDetail setTimeSpent(Integer timeSpent) {
+    public UBHomeworkSessionUserTrackingAttemptDetail setTimeSpent(Long timeSpent) {
         this.timeSpent = timeSpent;
         return this;
     }

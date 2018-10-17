@@ -54,65 +54,71 @@ public class UBHomeworkSessionUserTrackingTopology {
         public void execute(Tuple tuple) {
             final String json = tuple.getString(0);
             ObjectMapper mapper = new ObjectMapper();
-            UBHomeworkSessionUserTracking log = null;
+            UBHomeworkSessionUserTracking sessionUserTracking = null;
             try {
-                log = mapper.readValue(json,UBHomeworkSessionUserTracking.class);
+                sessionUserTracking = mapper.readValue(json,UBHomeworkSessionUserTracking.class);
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error("The message from kafka, the data is {}", e.getMessage());
                 logger.error("The message from kafka transfer to UBHomeworkSessionUserTracking error: {}", e.getMessage());
             }
-            if (Objects.isNull(log)) {
+            if (Objects.isNull(sessionUserTracking)) {
                 this.collector.fail(tuple);
             } else {
                 Values values = new Values();
-                if (log.getHomeworkSessionUserTrackingId() == null) {
+                if (sessionUserTracking.getHomeworkSessionUserTrackingId() == null) {
                     logger.error("The message from kafka homeworkSessionUserTrackingId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getHomeworkSessionUserTrackingId());
-                if (log.getSessionId() == null) {
+                values.add(sessionUserTracking.getHomeworkSessionUserTrackingId());
+                if (sessionUserTracking.getSessionId() == null) {
                     logger.error("The message from kafka sessionId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getSessionId());
-                if (log.getHomeworkAssessmentId() == null) {
+                values.add(sessionUserTracking.getSessionId());
+                if (sessionUserTracking.getHomeworkAssessmentId() == null) {
                     logger.error("The message from kafka homeworkAssessmentId is inValidate : {}", json);
                     this.collector.fail(tuple);
                 }
-                values.add(log.getHomeworkAssessmentId());
-                if (log.getUserId() == null) {
+                values.add(sessionUserTracking.getHomeworkAssessmentId());
+                if (sessionUserTracking.getUserId() == null) {
                     logger.error("The message from kafka userId is inValidate : {}", json);
                     this.collector.fail(tuple);
 
                 }
-                values.add(log.getUserId());
-                values.add(!Objects.isNull(log.getNoOfVisits()) ? log.getNoOfVisits() : "\\N");
-                values.add(!Objects.isNull(log.getLastViewedOn()) ? Utils.formatDate2String(log.getLastViewedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getStatusId()) ? log.getStatusId() : "\\N");
-                values.add(!Objects.isNull(log.getCompletedOn()) ? Utils.formatDate2String(log.getCompletedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getScore()) ? log.getScore() : "\\N");
-                values.add(!Objects.isNull(log.getPercentScore()) ? log.getPercentScore() : "\\N");
-                values.add(!Objects.isNull(log.getCompleteAttempts()) ? log.getCompleteAttempts() : "\\N");
-                values.add(!Objects.isNull(log.getBeginDate()) ? Utils.formatDate2String(log.getBeginDate()) : "\\N");
-                values.add(!Objects.isNull(log.getEndDate()) ? Utils.formatDate2String(log.getEndDate()) : "\\N");
-                values.add(!Objects.isNull(log.getTimeSpent()) ? log.getTimeSpent() : "\\N");
-                values.add(!Objects.isNull(log.getInteractionTimer()) ? log.getInteractionTimer() : "\\N");
-                values.add(!Objects.isNull(log.getEmendStatus()) ? log.getEmendStatus() : "\\N");
-                values.add(!Objects.isNull(log.getRequiredEmend()) ? log.getRequiredEmend() : "\\N");
-                values.add(!Objects.isNull(log.getSubjectId()) ? log.getSubjectId() : "\\N");
-                values.add(!Objects.isNull(log.getReadCount()) ? log.getReadCount() : "\\N");
-                values.add(!Objects.isNull(log.getShowSubTitle()) ? log.getShowSubTitle() : "\\N");
-                values.add(!Objects.isNull(log.getEmendTypeCode()) ? log.getEmendTypeCode() : "\\N");
-                values.add(!Objects.isNull(log.getSessionGroupId()) ? log.getSessionGroupId() : "\\N");
-                values.add(!Objects.isNull(log.getDisplayOrder()) ? log.getDisplayOrder() : "\\N");
-                values.add(!Objects.isNull(log.getCreatedOn()) ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getCreatedBy()) ? log.getCreatedBy() : "\\N");
-                values.add(!Objects.isNull(log.getModifiedOn()) ? Utils.formatDate2String(log.getModifiedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getModifiedBy()) ? log.getModifiedBy() : "\\N");
-                values.add(!Objects.isNull(log.getDeletedOn()) ? Utils.formatDate2String(log.getDeletedOn()) : "\\N");
-                values.add(!Objects.isNull(log.getDeletedBy()) ? log.getDeletedBy() : "\\N");
-                values.add(!Objects.isNull(log.getDeleted()) ? log.getDeleted() : "\\N");
+                values.add(sessionUserTracking.getUserId());
+                values.add(!Objects.isNull(sessionUserTracking.getNoOfVisits()) ? sessionUserTracking.getNoOfVisits() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getLastViewedOn()) ? Utils.formatDate2String(sessionUserTracking.getLastViewedOn()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getStatusId()) ? sessionUserTracking.getStatusId() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getCompletedOn()) ? Utils.formatDate2String(sessionUserTracking.getCompletedOn()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getScore()) ? sessionUserTracking.getScore() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getPercentScore()) ? sessionUserTracking.getPercentScore() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getCompleteAttempts()) ? sessionUserTracking.getCompleteAttempts() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getBeginDate()) ? Utils.formatDate2String(sessionUserTracking.getBeginDate()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getEndDate()) ? Utils.formatDate2String(sessionUserTracking.getEndDate()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getTimeSpent()) ? sessionUserTracking.getTimeSpent() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getInteractionTimer()) ? sessionUserTracking.getInteractionTimer() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getEmendStatus()) ? sessionUserTracking.getEmendStatus() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getRequiredEmend()) ? sessionUserTracking.getRequiredEmend() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getSubjectId()) ? sessionUserTracking.getSubjectId() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getReadCount()) ? sessionUserTracking.getReadCount() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getShowSubTitle()) ? sessionUserTracking.getShowSubTitle() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getEmendTypeCode()) ? sessionUserTracking.getEmendTypeCode() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getSessionGroupId()) ? sessionUserTracking.getSessionGroupId() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getDisplayOrder()) ? sessionUserTracking.getDisplayOrder() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getCreatedOn()) ? Utils.formatDate2String(sessionUserTracking.getCreatedOn()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getCreatedBy()) ? sessionUserTracking.getCreatedBy() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getModifiedOn()) ? Utils.formatDate2String(sessionUserTracking.getModifiedOn()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getModifiedBy()) ? sessionUserTracking.getModifiedBy() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getDeletedOn()) ? Utils.formatDate2String(sessionUserTracking.getDeletedOn()) : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getDeletedBy()) ? sessionUserTracking.getDeletedBy() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getDeleted()) ? sessionUserTracking.getDeleted() : "\\N");
+
+                values.add(!Objects.isNull(sessionUserTracking.getHomeworkType()) ? sessionUserTracking.getHomeworkType() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getStandardLevel()) ? sessionUserTracking.getStandardLevel() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getStandardConf()) ? sessionUserTracking.getStandardConf() : "\\N");
+                values.add(!Objects.isNull(sessionUserTracking.getOcrErrorMsg()) ? sessionUserTracking.getOcrErrorMsg() : "\\N");
+
                 this.collector.ack(tuple);
                 this.collector.emit(values);
             }
