@@ -33,6 +33,7 @@ public class MyConfig {
 
 
     public static final float FILE_SIZE = 128f;
+    public static final String FIELD_DELIMITER = "\u0001";
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);

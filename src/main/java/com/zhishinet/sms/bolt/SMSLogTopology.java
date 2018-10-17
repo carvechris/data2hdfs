@@ -43,6 +43,7 @@ public class SMSLogTopology {
     public static final String SPOUTID = "ubusersmslogstorm";
     public static final String TOPOLOGY_NAME = "SMSLogTopology";
     private final static ObjectMapper mapper = new ObjectMapper();
+    final static float FILE_SIZE = 8f;
 
     public static class SplitDataBolt extends BaseRichBolt {
 
@@ -126,17 +127,17 @@ public class SMSLogTopology {
 
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
 
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
-        SyncPolicy syncPolicy = new CountSyncPolicy(100);
+        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
+        SyncPolicy syncPolicy = new CountSyncPolicy(1);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
-        builder.setBolt("splitDataBolt",new SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("splitDataBolt");
+        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig));
+        builder.setBolt("splitDataBolt",new SplitDataBolt()).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt",hdfsBolt).shuffleGrouping("splitDataBolt");
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 

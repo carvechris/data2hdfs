@@ -110,7 +110,7 @@ public class HomeworkAssessmentUserInteractionTopology {
 
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter("\001");
+        RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetTridentFileNameFormat().withPath("/user/storm/HomeworkAssessmentUserInteraction/").withExtension(".txt");

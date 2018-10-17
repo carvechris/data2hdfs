@@ -131,7 +131,7 @@ public class HomeworkAssessmentUserInteractionTopology {
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
         final String TOPIC = args[0];
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,TOPIC.toLowerCase()+"storm");
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
+        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         // sync the filesystem after every 1000 tuples
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 128MB
