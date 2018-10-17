@@ -1,90 +1,57 @@
 package com.hand.zhishinet.assessment.vo;
-/**
- * Created by jianpeng.liu@hand-china.com on 2017/5/16.
- */
-
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author jianpeng.liu@hand-china.com	2018/9/18 16:17
- * @description
+ * @author zong.liu01@hand-china.com  2018/10/16 1:00
+ * @version 1.0
+ * @name CombineLaunch
+ * @description HDFS中的表(UBHomeworkSessionUserTracking)对应的类
  */
+public class UBHomeworkSessionUserTracking implements Serializable {
 
-
-public class UBHomeworkSessionUserTracking  implements Serializable {
-
-    private static final long serialVersionUID = 4898677768856561034L;
+    private static final long serialVersionUID = -434432423112121L;
     private Long homeworkSessionUserTrackingId;
-
     private Integer sessionId;
-
     private Long homeworkAssessmentId;
-
     private Integer userId;
-
-    private Integer	noOfVisits;
-
+    private Integer noOfVisits;
     private Date lastViewedOn;
-
     private Integer statusId;
-
     private Date completedOn;
-
     private Float score;
-
     private Float percentScore;
-
     private Integer completeAttempts;
-
     private Date beginDate;
-
     private Date endDate;
-
     private Long timeSpent;
-
     private String interactionTimer;
-
     private Integer articleLocation;
-
     private String location;
-
     private Boolean isChecked;
-
     private Integer forLearnerStatus;
-
     private String questionIndexs;
-
     private String emendStatus;
-
     private Boolean IsRequiredEmend;
-
     private Integer subjectId;
-
     private Integer readCount;
-
     private Boolean showSubTitle;
-
     private String emendTypeCode;
-
     private Integer sessionGroupId;
-
     private Integer displayOrder;
-
     private Date createdOn;
-
     private Integer createdBy;
-
     private Date modifiedOn;
-
     private Integer modifiedBy;
-
     private Date deletedOn;
-
     private Integer deletedBy;
+    private Boolean deleted = Boolean.FALSE;
 
-    private Boolean deleted = false;
+    private String homeworkType;
+    private String standardLevel;
+    private Double standardConf;
+    private String ocrErrorMsg;
 
     public Long getHomeworkSessionUserTrackingId() {
         return homeworkSessionUserTrackingId;
@@ -364,5 +331,37 @@ public class UBHomeworkSessionUserTracking  implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public String getHomeworkType() {
+        return homeworkType;
+    }
+
+    public void setHomeworkType(String homeworkType) {
+        this.homeworkType = homeworkType;
+    }
+
+    public String getStandardLevel() {
+        return standardLevel;
+    }
+
+    public void setStandardLevel(String standardLevel) {
+        this.standardLevel = standardLevel;
+    }
+
+    public Double getStandardConf() {
+        return standardConf;
+    }
+
+    public void setStandardConf(Double standardConf) {
+        this.standardConf = standardConf;
+    }
+
+    public String getOcrErrorMsg() {
+        return ocrErrorMsg;
+    }
+
+    public void setOcrErrorMsg(String ocrErrorMsg) {
+        this.ocrErrorMsg = ocrErrorMsg;
     }
 }

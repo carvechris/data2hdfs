@@ -1,15 +1,16 @@
 package com.hand.zhishinet.assessment.vo;
 
+import java.util.Date;
+
 /**
- * @author zong.liu01@hand-china.com  2018/9/19 13:49
+ * @author zong.liu01@hand-china.com  2018/10/16 1:00
  * @version 1.0
- * @name zhishinet-bigData
- * @description
+ * @name CombineLaunch
+ * @description HDFS中的表(UBHomeworkAssessmentSession)对应的类
  */
-public class UBHomeworkAssessmentSession extends BaseDTO implements java.io.Serializable {
+public class UBHomeworkAssessmentSession implements java.io.Serializable {
 
-    private static final long serialVersionUID = 11158919214213098L;
-
+    private static final long serialVersionUID = -121111121467098L;
     private Long assessmentSessionId;
     private Long homeworkAssessmentId;
     private Integer sessionGroupId;
@@ -18,10 +19,15 @@ public class UBHomeworkAssessmentSession extends BaseDTO implements java.io.Seri
     private Boolean isRequire;
     private Integer sessionId;
     private Boolean isClose;
+    private String homeworkType;
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
+    protected Date createdOn;
+    protected Integer createdBy;
+    protected Date modifiedOn;
+    protected Integer modifiedBy;
+    protected Date deletedOn;
+    protected Integer deletedBy;
+    protected Boolean isDeleted;
 
     public Long getAssessmentSessionId() {
         return assessmentSessionId;
@@ -85,5 +91,69 @@ public class UBHomeworkAssessmentSession extends BaseDTO implements java.io.Seri
 
     public void setClose(Boolean close) {
         isClose = close;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(Date modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public Integer getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(Integer modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Date getDeletedOn() {
+        return deletedOn;
+    }
+
+    public void setDeletedOn(Date deletedOn) {
+        this.deletedOn = deletedOn;
+    }
+
+    public Integer getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(Integer deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public String getHomeworkType() {
+        return homeworkType;
+    }
+
+    public void setHomeworkType(String homeworkType) {
+        this.homeworkType = homeworkType;
     }
 }

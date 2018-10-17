@@ -106,6 +106,8 @@ public class UBHomeworkAssessmentSessionTopology {
                 values.add(!Objects.isNull(assessmentSession.getDeletedBy()) ? assessmentSession.getDeletedBy() : "\\N");
                 values.add(!Objects.isNull(assessmentSession.getDeletedOn()) ? Utils.formatDate2String(assessmentSession.getDeletedOn()) : "\\N");
 
+                values.add(!Objects.isNull(assessmentSession.getHomeworkType()) ? assessmentSession.getHomeworkType() : "\\N");
+
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
             }

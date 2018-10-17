@@ -146,13 +146,16 @@ public class UBHomeworkAssessmentTopology {
                 values.add(!Objects.isNull(assessment.getDisplayOrder()) ? assessment.getDisplayOrder() : "\\N");
                 values.add(!Objects.isNull(assessment.getTextbookId()) ? assessment.getTextbookId() : "\\N");
                 values.add(!Objects.isNull(assessment.getTextbookSeriesId()) ? assessment.getTextbookSeriesId() : "\\N");
-                values.add(StringUtils.isNotBlank(assessment.getIntroText()) ? assessment.getIntroText() : "\\N");
+                values.add(StringUtils.isNotEmpty(assessment.getIntroText()) ? assessment.getIntroText() : "\\N");
                 values.add(!Objects.isNull(assessment.getCreatedBy()) ? assessment.getCreatedBy() : "\\N");
                 values.add(!Objects.isNull(assessment.getCreatedOn()) ? Utils.formatDate2String(assessment.getCreatedOn()) : "\\N");
                 values.add(!Objects.isNull(assessment.getModifiedBy()) ? assessment.getModifiedBy() : "\\N");
                 values.add(!Objects.isNull(assessment.getModifiedOn()) ? Utils.formatDate2String(assessment.getModifiedOn()) : "\\N");
                 values.add(!Objects.isNull(assessment.getDeletedBy()) ? assessment.getDeletedBy() : "\\N");
                 values.add(!Objects.isNull(assessment.getDeletedOn()) ? Utils.formatDate2String(assessment.getDeletedOn()) : "\\N");
+
+                values.add(!StringUtils.isNotEmpty(assessment.getHomeworkType()) ? assessment.getHomeworkType() : "\\N");
+                values.add(!Objects.isNull(assessment.getQuestionRandom()) ? assessment.getQuestionRandom() : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);

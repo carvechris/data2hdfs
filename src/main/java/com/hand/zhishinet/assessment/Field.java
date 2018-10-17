@@ -30,7 +30,8 @@ public class Field {
                 "showSubTitle","displayOrder","textbookId",
                 "textbookSeriesId","assessmentIntroText","createdBy",
                 "createdOn","modifiedBy","modifiedOn",
-                "deletedBy","deletedOn");
+                "deletedBy","deletedOn","homeworkType",
+                "isQuestionRandom");
     }
 
     public static Fields getHomeworkAssessmentSessionFields(){
@@ -38,7 +39,7 @@ public class Field {
                 "emendTypeCode","isClose","isRequire",
                 "isRequiredEmend", "isDeleted","sessionGroupId",
                 "createdBy","createdOn","modifiedBy",
-                "modifiedOn", "deletedBy","deletedOn");
+                "modifiedOn", "deletedBy","deletedOn","homeworkType");
     }
 
     public static Fields getHomeworkSessionUserTrackingFields() {
@@ -46,7 +47,7 @@ public class Field {
                 "lastViewedOn","statusId","completedOn","score","percentScore","completeAttempts","beginDate","endDate","timeSpent",
                 "interactionTimer","emendStatus","IsRequiredEmend",
                 "subjectId","readCount","showSubTitle","emendTypeCode","sessionGroupId","displayOrder","createdOn","createdBy","modifiedOn",
-                "modifiedBy","deletedOn","deletedBy","deleted");
+                "modifiedBy","deletedOn","deletedBy","deleted","homeworkType","standardLevel","standardConf","ocrErrorMsg");
     }
 
     /**
