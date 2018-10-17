@@ -10,6 +10,7 @@ import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
+import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -83,7 +84,7 @@ public class HDFSTopology  {
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/hdfs/");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/hdfs/");
         HdfsBolt bolt = new HdfsBolt()
                 .withFsUrl(MyConfig.HDFS_URL)
                 .withFileNameFormat(fileNameFormat)
