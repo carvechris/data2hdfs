@@ -47,7 +47,6 @@ public class HDFSTopology  {
         @Override
         public void nextTuple() {
             this.spoutOutputCollector.emit(new Values(++i,"name"+i,"测试"+i));
-            Utils.sleep(200);
         }
 
         @Override
