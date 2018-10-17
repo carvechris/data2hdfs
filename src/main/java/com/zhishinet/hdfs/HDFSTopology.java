@@ -81,17 +81,10 @@ public class HDFSTopology  {
     }
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        // use "|" instead of "," for field delimiter
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
-
-        // sync the filesystem after every 100 tuples
+        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
-
-        // rotate files when they reach 1MB
-        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
-
+        FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/hdfs/");
-
         HdfsBolt bolt = new HdfsBolt()
                 .withFsUrl(MyConfig.HDFS_URL)
                 .withFileNameFormat(fileNameFormat)
