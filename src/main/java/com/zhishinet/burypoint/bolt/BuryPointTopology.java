@@ -101,7 +101,7 @@ public class BuryPointTopology {
 
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
 
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
+        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/BuryPoint/").withExtension(".txt");
