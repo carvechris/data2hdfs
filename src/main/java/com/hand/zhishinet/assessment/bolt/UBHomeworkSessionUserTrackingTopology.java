@@ -136,16 +136,16 @@ public class UBHomeworkSessionUserTrackingTopology {
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
-        SyncPolicy syncPolicy = new CountSyncPolicy(100);
+        SyncPolicy syncPolicy = new CountSyncPolicy(MyConfig.COUNT_SYNC_POLICY);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkSessionUserTracking/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig),3);
-        builder.setBolt("homeworkSessionUserTrackingBolt",new UBHomeworkSessionUserTrackingBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt",hdfsBolt,3).shuffleGrouping("homeworkSessionUserTrackingBolt");
+        builder.setSpout("kafkaSpout",new KafkaSpout(spoutConfig));
+        builder.setBolt("homeworkSessionUserTrackingBolt",new UBHomeworkSessionUserTrackingBolt()).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt",hdfsBolt).shuffleGrouping("homeworkSessionUserTrackingBolt");
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
 

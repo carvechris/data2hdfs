@@ -133,7 +133,7 @@ public class HomeworkAssessmentUserInteractionTopology {
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,TOPIC.toLowerCase()+"storm");
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         // sync the filesystem after every 1000 tuples
-        SyncPolicy syncPolicy = new CountSyncPolicy(100);
+        SyncPolicy syncPolicy = new CountSyncPolicy(MyConfig.COUNT_SYNC_POLICY);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/"+TOPIC+"/").withExtension(".txt");
@@ -143,9 +143,9 @@ public class HomeworkAssessmentUserInteractionTopology {
         KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("kafkaSpout",kafkaSpout,3);
-        builder.setBolt("splitDataBolt", new SplitDataBolt(),3).shuffleGrouping("kafkaSpout");
-        builder.setBolt("hdfsBolt", hdfsBolt,3).shuffleGrouping("splitDataBolt");
+        builder.setSpout("kafkaSpout",kafkaSpout);
+        builder.setBolt("splitDataBolt", new SplitDataBolt()).shuffleGrouping("kafkaSpout");
+        builder.setBolt("hdfsBolt", hdfsBolt).shuffleGrouping("splitDataBolt");
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
