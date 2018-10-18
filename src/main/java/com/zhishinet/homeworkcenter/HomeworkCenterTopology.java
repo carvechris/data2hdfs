@@ -1,5 +1,6 @@
 package com.zhishinet.homeworkcenter;
 
+import com.hand.zhishinet.MyConfig;
 import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper1;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -155,7 +156,7 @@ public class HomeworkCenterTopology {
                 .withExtension(".txt")
                 .withPath("/user/tomaer/trident");
         RecordFormat recordFormat = new DelimitedRecordFormat()
-                .withFields(persistFields).withFieldDelimiter("\001");
+                .withFields(persistFields).withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(1.0f, FileSizeRotationPolicy.Units.MB);
         HdfsState.Options options = new HdfsState.HdfsFileOptions()
                 .withFileNameFormat(fileNameFormat)

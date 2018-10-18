@@ -2,10 +2,8 @@ package com.zhishinet.sms.trident;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
-import com.zhishinet.Utils;
 import com.zhishinet.sms.Field;
 import com.zhishinet.sms.UBUserSMSLog;
-import com.zhishinet.storm.ZhishinetTridentFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -16,6 +14,7 @@ import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.trident.HdfsState;
 import org.apache.storm.hdfs.trident.HdfsStateFactory;
 import org.apache.storm.hdfs.trident.HdfsUpdater;
+import org.apache.storm.hdfs.trident.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.trident.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.trident.format.FileNameFormat;
 import org.apache.storm.hdfs.trident.format.RecordFormat;
@@ -101,7 +100,7 @@ public class SMSLogTopology {
         RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new ZhishinetTridentFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
 
         HdfsState.Options options = new HdfsState.HdfsFileOptions()
                 .withFileNameFormat(fileNameFormat)

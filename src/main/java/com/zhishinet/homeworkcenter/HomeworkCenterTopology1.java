@@ -1,5 +1,6 @@
 package com.zhishinet.homeworkcenter;
 
+import com.hand.zhishinet.MyConfig;
 import com.zhishinet.homeworkcenter.processdata.PreProcessLauch2Tracking;
 import com.zhishinet.homeworkcenter.redis.AssessmentLookupMapper;
 import com.zhishinet.homeworkcenter.redis.AssessmentStoreMapper1;
@@ -76,7 +77,7 @@ public class HomeworkCenterTopology1 {
 
         Fields hdfsFields = new Fields(Field.SESSIONUSERTRACKINGID,Field.SUBJECT_ID, Field.ASSESSMENTID, Field.SESSIONID, Field.SCORE, Field.USERID);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/tomaer").withPrefix("trident").withExtension(".txt");
-        RecordFormat recordFormat = new DelimitedRecordFormat().withFields(hdfsFields).withFieldDelimiter("\u0001");
+        RecordFormat recordFormat = new DelimitedRecordFormat().withFields(hdfsFields).withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(5.0f, FileSizeRotationPolicy.Units.MB);
         HdfsState.Options options = new HdfsState.HdfsFileOptions().withFileNameFormat(fileNameFormat).withRecordFormat(recordFormat).withRotationPolicy(rotationPolicy).withFsUrl(Conf.HDFS_URL).withConfigKey("hdfs.config");
         StateFactory factory = new HdfsStateFactory().withOptions(options);

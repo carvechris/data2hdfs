@@ -5,7 +5,6 @@ import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.hand.zhishinet.assessment.vo.UBHomeworkSessionUserTrackingAttemptDetail;
 import com.zhishinet.Utils;
-import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
@@ -13,6 +12,7 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
+import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -118,10 +118,10 @@ public class UBHomeworkSessionUserTrackingAttemptDetailTopology {
 
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS, MyConfig.ZK_ROOT, SPOUTID);
 
-        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter("\001");
+        RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/HomeworkSessionUserTrackingAttemptDetail/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/HomeworkSessionUserTrackingAttemptDetail/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
