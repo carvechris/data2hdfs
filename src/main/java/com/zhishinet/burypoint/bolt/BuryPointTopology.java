@@ -2,6 +2,7 @@ package com.zhishinet.burypoint.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
+import com.zhishinet.Utils;
 import com.zhishinet.burypoint.Field;
 import com.zhishinet.burypoint.LoginBuryPoint;
 import org.apache.commons.lang.StringUtils;
@@ -78,12 +79,12 @@ public class BuryPointTopology {
                 values.add(StringUtils.isNotBlank(log.getPlatform()) ? log.getPlatform() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getAppName()) ? log.getAppName() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getAction()) ? log.getAction() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getActionTime()) ? log.getActionTime() : "\\N");
+                values.add(!Objects.isNull(log.getActionTime()) ? Utils.formatDate2String(log.getActionTime()) : "\\N");
                 values.add(StringUtils.isNotBlank(log.getNetType()) ? log.getNetType() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getLanguage()) ? log.getLanguage() : "\\N");
                 values.add((!Objects.isNull(log.getSuccess())) ? log.getSuccess() : "\\N");
                 values.add(StringUtils.isNotBlank(log.getErrorCode()) ? log.getErrorCode() : "\\N");
-                values.add(StringUtils.isNotBlank(log.getCreatedOn()) ? log.getCreatedOn() : "\\N");
+                values.add(!Objects.isNull(log.getCreatedOn()) ? Utils.formatDate2String(log.getCreatedOn()) : "\\N");
 
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);

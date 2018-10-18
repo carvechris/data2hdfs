@@ -1,5 +1,7 @@
 package com.zhishinet.burypoint;
 
+import java.util.Date;
+
 public class LoginBuryPoint {
     private Integer userid;
     private String openid;
@@ -12,12 +14,12 @@ public class LoginBuryPoint {
     private String platform;
     private String appName;
     private String action;
-    private String actionTime;
+    private Date actionTime;
     private String netType;
     private String language;
     private Integer success;
     private String errorCode;
-    private String createdOn;
+    private Date createdOn;
 
     public Integer getUserid() {
         return userid;
@@ -118,11 +120,11 @@ public class LoginBuryPoint {
         return this;
     }
 
-    public String getActionTime() {
+    public Date getActionTime() {
         return actionTime;
     }
 
-    public LoginBuryPoint setActionTime(String actionTime) {
+    public LoginBuryPoint setActionTime(Date actionTime) {
         this.actionTime = actionTime;
         return this;
     }
@@ -163,11 +165,11 @@ public class LoginBuryPoint {
         return this;
     }
 
-    public String getCreatedOn() {
+    public Date getCreatedOn() {
         return createdOn;
     }
 
-    public LoginBuryPoint setCreatedOn(String createdOn) {
+    public LoginBuryPoint setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
         return this;
     }
