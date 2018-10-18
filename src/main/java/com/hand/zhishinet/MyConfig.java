@@ -19,21 +19,19 @@ public class MyConfig {
      * 通用配置
      */
     public static final String ZK_HOSTS = "bigdata-ambari-agent-1:2181,bigdata-ambari-agent-2:2181,bigdata-ambari-agent-3:2181";
-    //    public static final String ZK_HOSTS = "172.30.74.239:2181,172.30.74.240:2181,172.30.74.241:2181";
-//    public static final String ZK_HOSTS = "127.0.0.1:2181";
-    public static final int ZK_PORT = 2181;
+    //public static final String ZK_HOSTS = "127.0.0.1:2181";
+
+    public static final String KAFKA_BROKERS = "bigdata-ambari-agent-1:6667,bigdata-ambari-agent-2:6667,bigdata-ambari-agent-3:6667";
+    //public static final String KAFKA_BROKERS = "127.0.0.1:9092";
+
+    public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
+    //public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
 
     public static final String ZK_ROOT = StringUtils.EMPTY;
-    public static final String KAFKA_BROKERS = "bigdata-ambari-agent-1:6667,bigdata-ambari-agent-2:6667,bigdata-ambari-agent-3:6667";
-    //    public static final String KAFKA_BROKERS = "172.30.74.239:6667,172.30.74.240:6667,172.30.74.241:6667";
-//    public static final String KAFKA_BROKERS = "127.0.0.1:9092";
-    public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020";
-//    public static final String HDFS_URL = "hdfs://bigdata-ambari-agent-1:8020,hdfs://bigdata-ambari-agent-2:8020，hdfs://bigdata-ambari-agent-3:8020";
-//    public static final String HDFS_URL = "hdfs://172.30.74.239:8020";
-
-
+    public static final int ZK_PORT = 2181;
     public static final float FILE_SIZE = 128f;
     public static final String FIELD_DELIMITER = "\u0001";
+    public static final int COUNT_SYNC_POLICY = 1000;
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
         ZkHosts zkHosts = new ZkHosts(zks);
@@ -59,7 +57,7 @@ public class MyConfig {
 
     public static Config getConfigWithKafkaConsumerProps(final boolean debug, final String brokers) {
         Config conf = new Config();
-        conf.setDebug(false);
+        conf.setDebug(debug);
         Properties props = new Properties();
         props.put("metadata.broker.list", brokers);
         props.put("producer.type", "async");
