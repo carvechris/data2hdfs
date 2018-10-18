@@ -100,7 +100,7 @@ public class SMSLogTopology {
         RecordFormat recordFormat = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/UserSMSLog/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/storm/UserSMSLog/").withExtension(".txt");
 
         HdfsState.Options options = new HdfsState.HdfsFileOptions()
                 .withFileNameFormat(fileNameFormat)
