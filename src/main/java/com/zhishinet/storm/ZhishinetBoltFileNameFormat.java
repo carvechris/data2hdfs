@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+@Deprecated
 public class ZhishinetBoltFileNameFormat implements FileNameFormat {
 
     private static final Logger logger = LoggerFactory.getLogger(ZhishinetBoltFileNameFormat.class);
