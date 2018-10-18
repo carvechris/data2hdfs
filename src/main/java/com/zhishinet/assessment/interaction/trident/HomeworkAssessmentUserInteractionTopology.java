@@ -124,9 +124,9 @@ public class HomeworkAssessmentUserInteractionTopology {
         StateFactory factory = new HdfsStateFactory().withOptions(options);
 
         TridentTopology topology = new TridentTopology();
-        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(MyConfig.getTridentKafkaConfig(TOPIC, MyConfig.ZK_HOSTS, SPOUTID))).parallelismHint(3)
-                .each(new Fields("str"),new SplitData(),Field.kafkaMessageFields).parallelismHint(3)
-                .partitionPersist(factory, Field.kafkaMessageFields, new HdfsUpdater(), new Fields()).parallelismHint(3);
+        topology.newStream("MyConfig",new TransactionalTridentKafkaSpout(MyConfig.getTridentKafkaConfig(TOPIC, MyConfig.ZK_HOSTS, SPOUTID)))
+                .each(new Fields("str"),new SplitData(),Field.kafkaMessageFields)
+                .partitionPersist(factory, Field.kafkaMessageFields, new HdfsUpdater(), new Fields());
 
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
