@@ -102,7 +102,7 @@ public class BuryPointTopology {
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
-        SyncPolicy syncPolicy = new CountSyncPolicy(100);
+        SyncPolicy syncPolicy = new CountSyncPolicy(1);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/BuryPoint/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
