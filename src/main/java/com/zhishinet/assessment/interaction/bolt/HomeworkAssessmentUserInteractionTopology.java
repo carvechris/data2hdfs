@@ -5,7 +5,6 @@ import com.hand.zhishinet.MyConfig;
 import com.hand.zhishinet.assessment.Field;
 import com.zhishinet.Utils;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
-import com.zhishinet.storm.ZhishinetBoltFileNameFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -14,6 +13,7 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.hdfs.bolt.HdfsBolt;
+import org.apache.storm.hdfs.bolt.format.DefaultFileNameFormat;
 import org.apache.storm.hdfs.bolt.format.DelimitedRecordFormat;
 import org.apache.storm.hdfs.bolt.format.FileNameFormat;
 import org.apache.storm.hdfs.bolt.format.RecordFormat;
@@ -136,7 +136,7 @@ public class HomeworkAssessmentUserInteractionTopology {
         SyncPolicy syncPolicy = new CountSyncPolicy(100);
         // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new ZhishinetBoltFileNameFormat().withPath("/user/storm/"+TOPIC+"/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/user/storm/"+TOPIC+"/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
