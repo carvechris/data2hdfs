@@ -9,9 +9,9 @@ export FOLDER=$1
 DATE=`date "+%Y-%m-%d"`
 
 # 创建指定的文件夹
-hadoop fs -mkdir -p /user/storm/${folder}/${DATE}
-hadoop fs -chown hdfs:hadoop /user/storm/${folder}/${DATE}
-hadoop fs -chmod 777 /user/storm/${folder}/${DATE}
+hadoop fs -mkdir -p /user/storm/${FOLDER}/${DATE}
+hadoop fs -chown hdfs:hadoop /user/storm/${FOLDER}/${DATE}
+hadoop fs -chmod 777 /user/storm/${FOLDER}/${DATE}
 
 
 # 获取 hdfs 目录下面所有的文件,循环将文件写入到文本文件中
@@ -34,11 +34,10 @@ sed -i '$d' /home/hdfs/${FOLDER}.needmv
 for line in `cat /home/hdfs/${FOLDER}.needmv`
 do
     mvFilename=${line##*/}
-    hadoop fs -mv $line /user/storm/${folder}/${DATE}/${mvFilename}
+    hadoop fs -mv $line /user/storm/${FOLDER}/${DATE}/${mvFilename}
 done
 rm -rf /home/hdfs/${FOLDER}.needmv
 
 # cp 文件到指定的目录
 cpFilename=${LASTLINE##*/}
-hadoop fs -cp $LASTLINE /user/storm/${folder}/${DATE}/${cpFilename}
-
+hadoop fs -cp $LASTLINE /user/storm/${FOLDER}/${DATE}/${cpFilename}
