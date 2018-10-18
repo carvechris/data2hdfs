@@ -10,8 +10,8 @@ DATE=`date "+%Y-%m-%d"`
 
 # 创建指定的文件夹
 hadoop fs -mkdir -p /user/storm/${FOLDER}/${DATE}
-hadoop fs -chown hdfs:hadoop /user/storm/${FOLDER}/${DATE}
-hadoop fs -chmod 777 /user/storm/${FOLDER}/${DATE}
+hadoop fs -chown -R hdfs:hadoop /user/storm/${FOLDER}/${DATE}
+hadoop fs -chmod -R 777 /user/storm/${FOLDER}/${DATE}
 
 
 # 获取 hdfs 目录下面所有的文件,循环将文件写入到文本文件中
