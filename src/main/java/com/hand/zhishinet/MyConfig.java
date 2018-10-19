@@ -31,7 +31,7 @@ public class MyConfig {
     public static final int ZK_PORT = 2181;
     public static final float FILE_SIZE = 128f;
     public static final String FIELD_DELIMITER = "\u0001";
-    public static final int COUNT_SYNC_POLICY = 1000;
+    public static final int COUNT_SYNC_POLICY = 100;
     public static final int PARTITION_COUNT_SYNC_POLICY = 1;
 
     public static SpoutConfig getKafkaSpoutConfig(final String topic, final String zks, final String zkRoot, final String spoutId) {
