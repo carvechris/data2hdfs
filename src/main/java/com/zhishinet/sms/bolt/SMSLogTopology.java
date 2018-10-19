@@ -126,7 +126,7 @@ public class SMSLogTopology {
         SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT, SPOUTID);
 
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
-        SyncPolicy syncPolicy = new CountSyncPolicy(MyConfig.COUNT_SYNC_POLICY);
+        SyncPolicy syncPolicy = new CountSyncPolicy(MyConfig.PARTITION_COUNT_SYNC_POLICY);
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
         FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/storm/UserSMSLog/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
