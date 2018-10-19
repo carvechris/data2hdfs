@@ -20,12 +20,12 @@ rm -rf /home/hdfs/partition_${DATE}
 
 for file in `hadoop fs -ls /apps/hive/warehouse/tmp.db/usersmslog_${DATE} |grep /apps/hive/warehouse/tmp.db |awk '{print $8}'`
 do
-    echo "LOAD DATA INPATH '${file}' into table usersmslog partition (dt='${DATE}');" >>/home/hdfs/partition_${DATE}
+    echo "LOAD DATA INPATH '${file}' into table usersmslog partition (dt='${DATE2}');" >>/home/hdfs/partition_${DATE}
 done
 
 for file in `hadoop fs -ls /apps/hive/warehouse/tmp.db/loginburypoint_${DATE} |grep /apps/hive/warehouse/tmp.db |awk '{print $8}'`
 do
-    echo "LOAD DATA INPATH '${file}' into table loginburypoint partition (dt='${DATE}');" >>/home/hdfs/partition_${DATE}
+    echo "LOAD DATA INPATH '${file}' into table loginburypoint partition (dt='${DATE2}');" >>/home/hdfs/partition_${DATE}
 done
 
 echo "drop table tmp.usersmslog_${DATE};" >>/home/hdfs/partition_${DATE}
