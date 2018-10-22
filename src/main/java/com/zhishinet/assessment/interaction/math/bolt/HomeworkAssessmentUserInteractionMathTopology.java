@@ -1,10 +1,10 @@
-package com.zhishinet.assessment.interaction.bolt;
+package com.zhishinet.assessment.interaction.math.bolt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hand.zhishinet.MyConfig;
-import com.hand.zhishinet.assessment.Field;
 import com.zhishinet.Utils;
 import com.zhishinet.assessment.interaction.HomeworkAssessmentUserInteraction;
+import com.zhishinet.assessment.interaction.math.Field;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -37,9 +37,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-public class HomeworkAssessmentUserInteractionTopology {
+public class HomeworkAssessmentUserInteractionMathTopology {
 
     private final static ObjectMapper mapper = new ObjectMapper();
+    private static final String TOPIC = "HomeworkAssessmentUserInteractionMath";
+    public static final String SPOUTID = "homeworkassessmentuserinteractionmathstorm";
+    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionMathTopology";
 
     public static class SplitDataBolt extends BaseRichBolt {
 
@@ -110,12 +113,6 @@ public class HomeworkAssessmentUserInteractionTopology {
                 values.add(!Objects.isNull(haui.getDeletedOn()) ? Utils.formatDate2String(haui.getDeletedOn()) : "\\N");
                 values.add((!Objects.isNull(haui.getDeletedBy())) ? haui.getDeletedBy() : "\\N");
                 values.add(haui.isDeleted());
-                values.add(StringUtils.isNotBlank(haui.getQuestionAnswer()) ? haui.getQuestionAnswer() : "\\N");
-                values.add((!Objects.isNull(haui.getReadCount())) ? haui.getReadCount() : "\\N");
-                values.add((!Objects.isNull(haui.getStandardScore())) ? haui.getStandardScore() : "\\N");
-                values.add(StringUtils.isNotBlank(haui.getAudioPath()) ? haui.getAudioPath() : "\\N");
-                values.add((!Objects.isNull(haui.getOralScore())) ? haui.getOralScore() : "\\N");
-                values.add((!Objects.isNull(haui.getGuessWordTimeSpent())) ? haui.getGuessWordTimeSpent() : "\\N");
                 values.add((!Objects.isNull(haui.getSessionId())) ? haui.getSessionId() : "\\N");
                 this.outputCollector.ack(tuple);
                 this.outputCollector.emit(values);
@@ -124,19 +121,16 @@ public class HomeworkAssessmentUserInteractionTopology {
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(Field.getUBHomeworkAssessmentUserInteractionFields());
+            outputFieldsDeclarer.declare(Field.kafkaMessageFields);
         }
     }
 
     public static void main(String[] args) throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        final String TOPIC = args[0];
-        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,TOPIC.toLowerCase()+"storm");
+        SpoutConfig spoutConfig = MyConfig.getKafkaSpoutConfig(TOPIC, MyConfig.ZK_HOSTS,MyConfig.ZK_ROOT,SPOUTID);
         RecordFormat format = new DelimitedRecordFormat().withFieldDelimiter(MyConfig.FIELD_DELIMITER);
-        // sync the filesystem after every 1000 tuples
         SyncPolicy syncPolicy = new CountSyncPolicy(MyConfig.COUNT_SYNC_POLICY);
-        // rotate files when they reach 128MB
         FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(MyConfig.FILE_SIZE, FileSizeRotationPolicy.Units.MB);
-        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/storm/"+TOPIC+"/").withExtension(".txt");
+        FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath("/tmp/storm/HomeworkAssessmentUserInteractionMath/").withExtension(".txt");
         HdfsBolt hdfsBolt = new HdfsBolt().withFsUrl(MyConfig.HDFS_URL).withFileNameFormat(fileNameFormat)
                 .withRecordFormat(format).withRotationPolicy(rotationPolicy).withSyncPolicy(syncPolicy);
 
@@ -150,10 +144,10 @@ public class HomeworkAssessmentUserInteractionTopology {
         Config config = MyConfig.getConfigWithKafkaConsumerProps(false,MyConfig.KAFKA_BROKERS);
         if(null != args && args.length > 0) {
 //            config.setNumWorkers(3);
-            StormSubmitter.submitTopology(TOPIC+"Topology", config, builder.createTopology());
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(TOPIC+"Topology",config,builder.createTopology());
+            cluster.submitTopology(TOPOLOGY_NAME,config,builder.createTopology());
         }
     }
 }
