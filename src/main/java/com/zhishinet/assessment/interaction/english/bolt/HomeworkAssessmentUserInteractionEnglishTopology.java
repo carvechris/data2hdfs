@@ -42,7 +42,7 @@ public class HomeworkAssessmentUserInteractionEnglishTopology {
     private final static ObjectMapper mapper = new ObjectMapper();
     private static final String TOPIC = "HomeworkAssessmentUserInteraction";
     public static final String SPOUTID = "homeworkassessmentuserinteractionstorm";
-    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionChineseTopology";
+    public static final String TOPOLOGY_NAME = "HomeworkAssessmentUserInteractionEnglishTopology";
 
     public static class SplitDataBolt extends BaseRichBolt {
 
