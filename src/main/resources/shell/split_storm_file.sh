@@ -15,7 +15,7 @@ hadoop fs -chmod -R 777 /user/storm/${FOLDER}/${DATE}
 
 
 # 获取 hdfs 目录下面所有的文件,循环将文件写入到文本文件中
-for file in `hadoop fs -ls /user/storm/${FOLDER} |grep /user/storm |awk '{print $8}'`
+for file in `hadoop fs -ls /tmp/storm/${FOLDER} |grep /tmp/storm |awk '{print $8}'`
 do
     echo $file >>/home/hdfs/${FOLDER}.file
 done
